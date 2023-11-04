@@ -1,6 +1,8 @@
-public class App {
+package com.sure.ftctp1;
 
-  public static void main(String[] args) throws CloneNotSupportedException {
+public class App2 {
+
+  public static void main2(String[] args) throws CloneNotSupportedException {
 
     Gramatica gramatica = new Gramatica("L", "SS");
     gramatica.inserirMuitasRegras("S", "b ?");

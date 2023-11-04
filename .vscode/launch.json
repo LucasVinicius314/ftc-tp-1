@@ -8,7 +8,7 @@
       "type": "java",
       "name": "App",
       "request": "launch",
-      "mainClass": "App",
+      "mainClass": "com.sure.ftctp1.Main",
       "projectName": "ftc-tp-1"
     }
   ]
