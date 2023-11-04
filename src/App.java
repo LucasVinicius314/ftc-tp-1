@@ -2,8 +2,8 @@ public class App {
 
   public static void main(String[] args) throws CloneNotSupportedException {
 
-    Gramatica gramatica = new Gramatica("L", "SbS");
-    gramatica.inserirMuitasRegras("S", "?");
+    Gramatica gramatica = new Gramatica("L", "SS");
+    gramatica.inserirMuitasRegras("S", "b ?");
     // gramatica.inserirMuitasRegras("S", "SE ?");
     // gramatica.inserirMuitasRegras("E", "a L");
 

@@ -74,75 +74,97 @@ public class Gramatica {
         // }
     }
 
+    public void novaPrimeiraRegra() {
+        for (int i = 0; i > -1; i++) {
+            String novaPrimeiraRegra = "" + primeiraRegra.charAt(0) + i;
+            if (!gramatica.containsKey(novaPrimeiraRegra)) {
+                gramatica.put(novaPrimeiraRegra, new Regras(primeiraRegra));
+                primeiraRegra = novaPrimeiraRegra;
+                return;
+            }
+        }
+    }
+
     public void tirarVazio() throws CloneNotSupportedException {
         // var lugaresOlha = new ArrayList<int>();
+        novaPrimeiraRegra();
 
         for (Map.Entry<String, Regras> regras : gramatica.entrySet()) {
-            for (ArrayVariaveis regra : regras.getValue().regras) {
+            for (ArrayRegra regra : regras.getValue().regras) {
                 for (String variaveis : regra.regra) {
+                    // ? = vazio = λ
                     if (variaveis.equals("?")) {
-                        for (Map.Entry<String, Regras> regras2 : gramatica.entrySet()) {
-                            var arrayVar = new ArrayList<ArrayVariaveis>();
-                            var a = regras2.getValue().regras;
-                            for (ArrayVariaveis regra2 : a) {
+                        for (Map.Entry<String, Regras> regrasVariavel : gramatica.entrySet()) {
+                            // array para guardar as novas regreeas que forem geradas
+                            var arrayVar = new ArrayList<ArrayRegra>();
+                            var regras2 = regrasVariavel.getValue().regras;
+                            for (ArrayRegra segmentoRegra : regras2) {
                                 ArrayList<Integer> lugaresOlha = new ArrayList<Integer>();
                                 int removidos = 0;
-                                ArrayVariaveis copuVariveis2 = new ArrayVariaveis();
-                                ArrayVariaveis copuVariveis1 = new ArrayVariaveis();
+                                ArrayRegra copuVariveis2 = new ArrayRegra();
+                                ArrayRegra copuVariveis1 = new ArrayRegra();
 
-                                copuVariveis2 = regra2.clone();
-                                copuVariveis1 = regra2.clone();
+                                copuVariveis2 = segmentoRegra.clone();
+                                copuVariveis1 = segmentoRegra.clone();
+
                                 copuVariveis1.regra = new ArrayList<String>();
-                                // System.arraycopy(copuVariveis2.regra, 0, copuVariveis1.regra, 0,
-                                // copuVariveis2.regra.size());
                                 copuVariveis1.regra.addAll(copuVariveis2.regra);
-                                var var = new ArrayVariaveis();
-                                var variaveis2 = regra2.regra;
-                                // for (String variaveis2 : regra2.regra) {
-                                for (int i = 0; i < variaveis2.size(); i++)
+
+                                var variaveis2 = segmentoRegra.regra;
+
+                                // Verificar todos os lugares com a variavel vazia ?
+                                for (int i = 0; i < variaveis2.size(); i++) {
                                     if (variaveis2.get(i).equals(regras.getKey())) {
                                         lugaresOlha.add(i);
                                     }
+                                }
+
                                 if (lugaresOlha.size() > 0) {
-                                    // for (int i = lugaresOlha.size() - 1; i >= 0; i--) {
                                     for (int i = 0; i < lugaresOlha.size(); i++) {
-                                        // ArrayVariaveis copuVariveis2 = new ArrayVariaveis();
+
+                                        // A cada incremento permite tirar uma letra a mais
+                                        int quantVariavelRetirar = 1;
+                                        // Quando for igual a quantVariavel acabou as opções de variaveis a serem
+                                        // retiradas
                                         int contador = 1;
-                                        int quantVariavel = 1;
-                                        int atual = 0;
-                                        // for (int m = lugaresOlha.size() - 1; m >= 0; m--) {
+                                        int varRetiradasAtualmente = 0;
+
                                         for (int m = 0; m <= lugaresOlha.size(); m++) {
 
                                             if (m != i) {
-                                                if (atual < quantVariavel && m < lugaresOlha.size()) {
+                                                if (varRetiradasAtualmente < quantVariavelRetirar
+                                                        && m < lugaresOlha.size()) {
                                                     int alo = lugaresOlha.get(m);
-                                                    copuVariveis2.regra.remove(alo - removidos - atual);
+                                                    copuVariveis2.regra
+                                                            .remove(alo - removidos - varRetiradasAtualmente);
                                                     // removidos++;
-                                                    atual++;
+                                                    varRetiradasAtualmente++;
 
                                                 } else {
-                                                    if (atual == quantVariavel) {
+                                                    if (varRetiradasAtualmente == quantVariavelRetirar) {
                                                         arrayVar.add(arrayVar.size(), copuVariveis2.clone());
-                                                        atual = 0;
-                                                        m -= quantVariavel;
+                                                        varRetiradasAtualmente = 0;
+                                                        m -= quantVariavelRetirar;
                                                     }
                                                     contador++;
 
                                                     copuVariveis2 = copuVariveis1.clone();
                                                     copuVariveis2.regra = new ArrayList<String>();
                                                     copuVariveis2.regra.addAll(copuVariveis1.regra);
+
                                                     if (contador == lugaresOlha.size()) {
-                                                        if (quantVariavel != lugaresOlha.size() - 1)
+                                                        // Olhar todos os lugar para frente da ocorrencia 0 da variavel
+                                                        if (quantVariavelRetirar != lugaresOlha.size() - 1)
                                                             m = 0;
                                                         else
-                                                            m = lugaresOlha.size() + 1;
-                                                        quantVariavel++;
-                                                        contador = quantVariavel;
+                                                            m = lugaresOlha.size() + 1; // acabou tudo
+                                                        quantVariavelRetirar++;
+                                                        contador = quantVariavelRetirar;
                                                     }
 
                                                 }
                                             }
-                                            // var var = new ArrayVariaveis();
+                                            // var var = new ArrayRegra();
                                             // for (int j = 0; j < variaveis2.size(); j++) {
                                             // if (variaveis2.get(i).equals(variaveis2).get(j)) {
                                             // var.inserirVariavel();
@@ -167,13 +189,13 @@ public class Gramatica {
                                     }
                                 }
                             }
-                            a.addAll(arrayVar);
+                            regras2.addAll(arrayVar);
 
                         }
                     }
                 }
             }
-
+            regras.getValue().removerRegra("?");
         }
         System.out.println("--------------");
     }
