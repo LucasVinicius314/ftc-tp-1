@@ -2,7 +2,7 @@ public class App {
 
   public static void main(String[] args) throws CloneNotSupportedException {
 
-    Gramatica gramatica = new Gramatica("L", "SbSbSbS");
+    Gramatica gramatica = new Gramatica("L", "SbS");
     gramatica.inserirMuitasRegras("S", "?");
     // gramatica.inserirMuitasRegras("S", "SE ?");
     // gramatica.inserirMuitasRegras("E", "a L");

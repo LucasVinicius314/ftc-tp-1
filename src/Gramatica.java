@@ -103,8 +103,7 @@ public class Gramatica {
                                     if (variaveis2.get(i).equals(regras.getKey())) {
                                         lugaresOlha.add(i);
                                     }
-                                if (lugaresOlha.size() > 0)
-
+                                if (lugaresOlha.size() > 0) {
                                     // for (int i = lugaresOlha.size() - 1; i >= 0; i--) {
                                     for (int i = 0; i < lugaresOlha.size(); i++) {
                                         // ArrayVariaveis copuVariveis2 = new ArrayVariaveis();
@@ -115,24 +114,25 @@ public class Gramatica {
                                         for (int m = 0; m <= lugaresOlha.size(); m++) {
 
                                             if (m != i) {
-                                                if (atual != quantVariavel) {
+                                                if (atual < quantVariavel && m < lugaresOlha.size()) {
                                                     int alo = lugaresOlha.get(m);
                                                     copuVariveis2.regra.remove(alo - removidos - atual);
                                                     // removidos++;
                                                     atual++;
 
                                                 } else {
-                                                    arrayVar.add(arrayVar.size(), copuVariveis2.clone());
-
-                                                    atual = 0;
-                                                    m -= quantVariavel + removidos;
+                                                    if (atual == quantVariavel) {
+                                                        arrayVar.add(arrayVar.size(), copuVariveis2.clone());
+                                                        atual = 0;
+                                                        m -= quantVariavel;
+                                                    }
                                                     contador++;
 
                                                     copuVariveis2 = copuVariveis1.clone();
                                                     copuVariveis2.regra = new ArrayList<String>();
                                                     copuVariveis2.regra.addAll(copuVariveis1.regra);
-                                                    if (contador == lugaresOlha.size() - removidos) {
-                                                        if (quantVariavel != lugaresOlha.size() - 1 - removidos)
+                                                    if (contador == lugaresOlha.size()) {
+                                                        if (quantVariavel != lugaresOlha.size() - 1)
                                                             m = 0;
                                                         else
                                                             m = lugaresOlha.size() + 1;
@@ -160,12 +160,14 @@ public class Gramatica {
                                         copuVariveis2.regra = new ArrayList<String>();
                                         copuVariveis2.regra.addAll(copuVariveis1.regra);
                                         removidos++;
-                                        arrayVar.add(arrayVar.size(), copuVariveis1.clone());
+                                        if (lugaresOlha.size() != 0)
+                                            arrayVar.add(arrayVar.size(), copuVariveis1.clone());
                                         i--;
                                         // arrayVar.add();
                                     }
-
+                                }
                             }
+                            a.addAll(arrayVar);
 
                         }
                     }
