@@ -15,15 +15,17 @@ public class Regras {
 
   public void removerRegra(String deletar) {
     for (int i = 0; i < regras.size(); i++) {
-      if (regras.get(i).regraCompleta.equals(deletar)) {
-        regras.remove(i);
+      for (int j = 0; j < regras.get(i).regra.size(); j++) {
+        if (regras.get(i).regra.get(j).equals(deletar)) {
+          regras.remove(i);
+          return;
+        }
       }
     }
   }
 
-  public void inserirVariaveis(String regra) {
-
-    var a = new ArrayRegra(regra);
+  public ArrayRegra inserirArrayRegra(String regra) {
+    var a = new ArrayRegra();
     String palavra = "" + regra.charAt(0);
 
     for (int j = 1; j < regra.length(); j++) {
@@ -36,6 +38,21 @@ public class Regras {
     }
 
     a.inserirVariavel(palavra);
+    return a;
+  }
+
+  public ArrayRegra inserirVariaveis(String regra) {
+    var a = inserirArrayRegra(regra);
     regras.add(a);
+    return a;
+  }
+
+  public boolean contem(String contem) {
+    for (ArrayRegra arrayRegra : regras) {
+      if (arrayRegra.regra.contains(contem)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

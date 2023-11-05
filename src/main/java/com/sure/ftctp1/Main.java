@@ -1,142 +1,33 @@
 package com.sure.ftctp1;
 
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-
-import org.json.*;
-
 public class Main {
-  public static void main(String args[]) {
-    if (args.length != 1) {
-      System.err.println("Arquivo não detectado. Favor inserir com a gramática [GLC]");
-      return;
-    }
 
-    FileReader fileReader = null;
-    try {
-      fileReader = new FileReader(args[0]);
-    } catch (Exception exception) {
-      exception.printStackTrace();
-      return;
-    }
+  public static void main(String[] args) throws CloneNotSupportedException {
 
-    // Setup JSON
-    JSONTokener tokener = new JSONTokener(fileReader);
-    JSONObject object = new JSONObject(tokener);
-    JSONArray glc = object.getJSONArray("glc");
+    // Gramatica gramatica = new Gramatica("L", "SaSaSaS");
+    // gramatica.inserirMuitasRegras("S", "b ?");
+    // Gramatica gramatica = new Gramatica("L", "SaSaSaS ?");
+    // gramatica.inserirMuitasRegras("S", "b");
 
-    // Cadastrar elementos
-    HashSet<Character> elements = new HashSet<Character>();
-    JSONArray symbols = glc.getJSONArray(1);
-    for (int i = 0; i < symbols.length(); i++) {
-      Character c = symbols.get(i).toString().charAt(0);
-      elements.add(c);
-    }
+    Gramatica gramatica = new Gramatica("S", "AB BC");
+    gramatica.inserirMuitasRegras("A", "a BA");
+    gramatica.inserirMuitasRegras("B", "CC b");
+    gramatica.inserirMuitasRegras("C", "a AB");
 
-    // Cadastrar regras
-    HashMap<Character, Rule> rules = new HashMap<Character, Rule>();
-    JSONArray states = glc.getJSONArray(0);
-    for (int i = 0; i < states.length(); i++) {
-      Character identifier = states.getString(i).toString().charAt(0);
-      Rule currentRule = new Rule(identifier);
-      rules.put(identifier, currentRule);
-    }
+    // gramatica.inserirMuitasRegras("S", "SE ?");
+    // gramatica.inserirMuitasRegras("E", "a L");
 
-    // Inserir transicoes nas regras
-    JSONArray transitions = glc.getJSONArray(2);
-    for (int transitionsCounter = 0; transitionsCounter < transitions.length(); transitionsCounter++) {
-      JSONArray currentTransitionArray = transitions.getJSONArray(transitionsCounter);
+    // Gramatica gramatica = new Gramatica("S", "Z A bN");
 
-      Character currentRuleIdentification = currentTransitionArray.get(0).toString().charAt(0);
-      String currentTransitionString = currentTransitionArray.get(1).toString();
+    // // gramatica.inserirMuitasRegras("S", "Z A bN");
+    // gramatica.inserirMuitasRegras("Z", "aZb b bN");
+    // gramatica.inserirMuitasRegras("N", "Na Nb ? bN aN");
+    // gramatica.inserirMuitasRegras("A", "aAb a aA baN");
 
-      if (rules.containsKey(currentRuleIdentification)) {
-        Rule currentRule = rules.get(currentRuleIdentification);
-        currentRule.pushTransitions(currentTransitionString);
-        rules.put(currentRuleIdentification, currentRule);
-      }
-    }
+    gramatica.formaNormalChomsky();
 
-    // Criar gram�tica e definir regra inicial
-    String start = glc.getString(3);
-    HashSet<Rule> rulesInHashSet = new HashSet<Rule>(rules.values());
-    Grammar grammar = new Grammar(start, elements, rulesInHashSet);
-
-    // Main.printFormatedGrammar(grammar);// Antes
-    grammar = Chomsky.applyChomsky(grammar); // Traduzir G para FNC
-    // Main.printFormatedGrammar(grammar);// Depois
-
-    Main.printGrammarInJSON(grammar);
-  }
-
-  private static void printFormatedGrammar(Grammar grammar) {
-    Iterator<Rule> rulesIterator = grammar.rules.iterator();
-    while (rulesIterator.hasNext()) {
-      Rule currentRule = rulesIterator.next();
-      ArrayList<String> currentRuleTransitions = currentRule.getTransitions();
-      String transitionsString = "";
-
-      for (int i = 0; i < currentRuleTransitions.size(); i++) {
-        transitionsString += currentRuleTransitions.get(i) + " | ";
-      }
-
-      if (transitionsString.length() > 2)
-        transitionsString = transitionsString.substring(0, transitionsString.length() - 2);
-
-      System.out.println(currentRule.getIdentifier().toString() + " -> " + transitionsString);
-    }
-  }
-
-  private static void printGrammarInJSON(Grammar grammar) {
-    System.out.println("{ \"glc\": [");
-
-    // Imprimir regras
-    Iterator<Rule> rulesIterator = grammar.rules.iterator();
-    System.out.print("    [");
-    while (rulesIterator.hasNext()) {
-      Rule currentRule = rulesIterator.next();
-      System.out.print("\"" + currentRule.getIdentifier() + "\"");
-      if (rulesIterator.hasNext())
-        System.out.print(", ");
-    }
-    System.out.print("],");
-
-    // Imprimir elementos
-    Iterator<Character> elementsIterator = grammar.alphabet.iterator();
-    System.out.print("\n    [");
-    while (elementsIterator.hasNext()) {
-      Character currentElement = elementsIterator.next();
-      System.out.print("\"" + currentElement + "\"");
-      if (elementsIterator.hasNext())
-        System.out.print(", ");
-    }
-    System.out.print("],");
-
-    // Imprimir transicoes
-    rulesIterator = grammar.rules.iterator();
-    System.out.print("\n    [");
-    while (rulesIterator.hasNext()) {
-      Rule currentRule = rulesIterator.next();
-      String identifier = currentRule.getIdentifier().toString();
-      ArrayList<String> transitions = currentRule.getTransitions();
-
-      Iterator<String> transitionsIterator = transitions.iterator();
-      while (transitionsIterator.hasNext()) {
-        String transition = transitionsIterator.next();
-        System.out.print("\n    [");
-        System.out.print("\"" + identifier + "\", \"" + transition + "\"],");
-        if (elementsIterator.hasNext())
-          System.out.print(", ");
-      }
-    }
-    System.out.print("\n    ],\n");
-
-    // Imprimir regra inicial
-    System.out.println("    \"" + grammar.initialRuleIdentifier + "\"");
-
-    System.out.println("]}");
+    gramatica.imprimirRegras();
+    // System.out.println("Hello world");
+    // System.out.println(gramatica);
   }
 }
