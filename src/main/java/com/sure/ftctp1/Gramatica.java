@@ -10,11 +10,9 @@ public class Gramatica {
   String vazio = "?";
   HashMap<String, Regras> gramatica = new HashMap<>();
   ArrayList<String> terminais = new ArrayList<>();
-  ArrayList<String> naoTerminais = new ArrayList<>();
 
   Gramatica(String naoTerminal, String regra) {
     primeiraRegra = naoTerminal;
-    naoTerminais.add(naoTerminal);
     inserirMuitasRegras(naoTerminal, regra);
   }
 
@@ -25,9 +23,6 @@ public class Gramatica {
       if (gramatica.containsKey(naoTerminal)) {
         variaveis = gramatica.get(naoTerminal).inserirVariaveis(regra);
       } else {
-
-        naoTerminais.add(naoTerminal);
-
         var novaRegra = new Regras();
         variaveis = novaRegra.inserirVariaveis(regra);
         gramatica.put(naoTerminal, novaRegra);
@@ -96,7 +91,6 @@ public class Gramatica {
     for (int i = 0; i > -1; i++) {
       String novaPrimeiraRegra = "" + primeiraRegra.charAt(0) + i;
       if (!gramatica.containsKey(novaPrimeiraRegra)) {
-        naoTerminais.add(novaPrimeiraRegra);
         var novaRegra = new Regras();
         novaRegra.inserirVariaveis(primeiraRegra);
         gramatica.put(novaPrimeiraRegra, novaRegra);
@@ -198,7 +192,7 @@ public class Gramatica {
                         copuVariveis2 = copuVariveis1.clone();
 
                       } else {
-                        if (!regrasOlhar.getValue().contem(vazio)) {
+                        if (!regrasOlhar.getValue().contemArray(vazio)) {
                           copuVariveis1.inserirVariavel(vazio);
                           arrayVar.add(arrayVar.size(), copuVariveis1.clone());
                         }
@@ -243,16 +237,63 @@ public class Gramatica {
   }
 
   public boolean fazerCykNormal(String testarCadeia) {
-    var regra = new Regras();
-    var testarCadeiaArray = regra.inserirArrayRegra(testarCadeia);
+    var regraCadeiTeste = new Regras();
+    var testarCadeiaArray = regraCadeiTeste.inserirArrayRegra(testarCadeia);
 
     for (String variavel : testarCadeiaArray.regra) {
-      if (terminais.contains(variavel) || naoTerminais.contains(variavel)) {
+      if (!terminais.contains(variavel) && !gramatica.keySet().contains(variavel)) {
         return false;
       }
     }
 
-    // var matrizProducao[][]
+    Regras[][] matrizProducao = new Regras[testarCadeiaArray.regra.size()][testarCadeiaArray.regra.size()];
+
+    for (int i = 0; i < testarCadeiaArray.regra.size(); i++) {
+      for (var hashGramatica : gramatica.entrySet()) {
+        if (hashGramatica.getValue().contemArray(testarCadeiaArray.regra.get(i))) {
+          if (matrizProducao[0][i] == null) {
+            var novaRegra = new Regras();
+            matrizProducao[0][i] = novaRegra;
+          }
+          matrizProducao[0][i].inserirVariaveis(hashGramatica.getKey());
+        }
+      }
+    }
+
+    for (int i = 2; i <= testarCadeiaArray.regra.size(); i++) {
+      for (int j = 1; j <= testarCadeiaArray.regra.size() - i + 1; j++) {
+        for (int k = 1, m = i - 2, n = j; k < i; k++, m--, n++) {
+
+          if (!(matrizProducao[k - 1][j - 1] == null || matrizProducao[m][n].regras == null)) {
+            for (var var1 : matrizProducao[k - 1][j - 1].regras) {
+              for (var var2 : matrizProducao[m][n].regras) {
+
+                String producao = "" + var1.regraCompleta + var2.regraCompleta;
+
+                for (var hashGramatica : gramatica.entrySet()) {
+                  if (hashGramatica.getValue().contem(producao)) {
+                    if (matrizProducao[i - 1][j - 1] == null) {
+                      var novaRegra = new Regras();
+                      matrizProducao[i - 1][j - 1] = novaRegra;
+                    }
+                    if (!matrizProducao[i - 1][j - 1].contem(hashGramatica.getKey())) {
+                      matrizProducao[i - 1][j - 1]
+                          .inserirVariaveis(hashGramatica.getKey());
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // }
+    if (matrizProducao[testarCadeiaArray.regra.size() - 1][0] != null
+        && matrizProducao[testarCadeiaArray.regra.size() - 1][0].contem(primeiraRegra)) {
+      return true;
+    }
 
     return false;
   }

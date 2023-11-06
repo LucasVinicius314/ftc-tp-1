@@ -3,7 +3,7 @@ package com.sure.ftctp1;
 import java.util.ArrayList;
 
 public class Regras {
-  ArrayList<ArrayRegra> regras = new ArrayList<ArrayRegra>();
+  ArrayList<ArrayRegra> regras = new ArrayList<>();
 
   Regras(String regras) {
     // regras.add(regras);
@@ -47,9 +47,18 @@ public class Regras {
     return a;
   }
 
-  public boolean contem(String contem) {
+  public boolean contemArray(String contem) {
     for (ArrayRegra arrayRegra : regras) {
       if (arrayRegra.regra.contains(contem)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean contem(String contem) {
+    for (ArrayRegra arrayRegra : regras) {
+      if (arrayRegra.regraCompleta.length() == contem.length() && arrayRegra.regraCompleta.contains(contem)) {
         return true;
       }
     }

@@ -3,7 +3,7 @@ package com.sure.ftctp1;
 import java.util.ArrayList;
 
 public class ArrayRegra implements Cloneable {
-  // String regraCompleta = "";
+  String regraCompleta = "";
   ArrayList<String> regra = new ArrayList<String>();
 
   // ArrayRegra(String regraCompleta) {
@@ -16,7 +16,7 @@ public class ArrayRegra implements Cloneable {
 
   void inserirVariavel(String variavel) {
     regra.add(variavel);
-    // regraCompleta += "" + variavel;
+    regraCompleta += "" + variavel;
   }
 
   // @Override
@@ -28,6 +28,7 @@ public class ArrayRegra implements Cloneable {
   public ArrayRegra clone() {
     var cloreArrayRegra = new ArrayRegra();
     cloreArrayRegra.regra.addAll(regra);
+    cloreArrayRegra.regraCompleta = regraCompleta;
     return cloreArrayRegra;
   }
 }
