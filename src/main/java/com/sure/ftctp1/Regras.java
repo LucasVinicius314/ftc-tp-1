@@ -64,4 +64,24 @@ public class Regras {
     }
     return false;
   }
+
+  public void imprimirRegras() {
+    if (regras.size() == 1) {
+      System.out.print(" ");
+      for (ArrayRegra arrayRegra : regras) {
+        System.out.print(arrayRegra.regraCompleta);
+      }
+      System.out.print(" ");
+    } else if (regras.size() == 2) {
+      System.out.print(" ");
+      for (ArrayRegra arrayRegra : regras) {
+        System.out.print(arrayRegra.regraCompleta);
+      }
+    } else {
+      for (ArrayRegra arrayRegra : regras) {
+        System.out.print(arrayRegra.regraCompleta);
+      }
+    }
+
+  }
 }

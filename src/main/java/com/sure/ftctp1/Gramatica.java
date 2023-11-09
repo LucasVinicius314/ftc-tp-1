@@ -237,6 +237,93 @@ public class Gramatica {
   }
 
   public boolean fazerCykNormal(String testarCadeia) {
+
+    if (testarCadeia.isEmpty() || testarCadeia.equals(vazio)) {
+      return gramatica.get(primeiraRegra).contem(vazio);
+    }
+
+    var regraCadeiTeste = new Regras();
+    var testarCadeiaArray = regraCadeiTeste.inserirArrayRegra(testarCadeia);
+
+    for (String variavel : testarCadeiaArray.regra) {
+      if (!terminais.contains(variavel) && !gramatica.keySet().contains(variavel)) {
+        return false;
+      }
+    }
+
+    Regras[][] matrizProducao = new Regras[testarCadeiaArray.regra.size()][testarCadeiaArray.regra.size()];
+
+    for (int i = 0; i < testarCadeiaArray.regra.size(); i++) {
+      for (var hashGramatica : gramatica.entrySet()) {
+        if (hashGramatica.getValue().contemArray(testarCadeiaArray.regra.get(i))) {
+          if (matrizProducao[i][i] == null) {
+            var novaRegra = new Regras();
+            matrizProducao[i][i] = novaRegra;
+          }
+          matrizProducao[i][i].inserirVariaveis(hashGramatica.getKey());
+        }
+      }
+    }
+
+    for (int j = 2; j <= testarCadeiaArray.regra.size(); j++) {
+      for (int i = j - 1; i >= 1; i--) {
+        for (int h = i/* , m = i - 2, n = j */; h <= j - 1; h++/* , m--,n++ */) {
+          if (!(matrizProducao[i - 1][h - 1] == null || matrizProducao[h][j - 1].regras == null)) {
+            for (var var1 : matrizProducao[i - 1][h - 1].regras) {
+              for (var var2 : matrizProducao[h][j - 1].regras) {
+
+                String producao = "" + var1.regraCompleta + var2.regraCompleta;
+
+                for (var hashGramatica : gramatica.entrySet()) {
+                  if (hashGramatica.getValue().contem(producao)) {
+                    if (matrizProducao[i - 1][j - 1] == null) {
+                      var novaRegra = new Regras();
+                      matrizProducao[i - 1][j - 1] = novaRegra;
+                    }
+                    if (!matrizProducao[i - 1][j - 1].contem(hashGramatica.getKey())) {
+                      matrizProducao[i - 1][j - 1]
+                          .inserirVariaveis(hashGramatica.getKey());
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    for (int i = 0; i < matrizProducao.length; i++) {
+      for (int j = 0; j < matrizProducao.length; j++) {
+        // System.out.print("i:" + i);
+        if (matrizProducao[i][j] != null) {
+          // System.out.print("i:" + i + "j:" + j + " ");
+          matrizProducao[i][j].imprimirRegras();
+        } else {
+          System.out.print("???");
+        }
+        System.out.print(" ");
+      }
+      System.out.println();
+    }
+
+    // }
+    // if (matrizProducao[testarCadeiaArray.regra.size() - 1][0] != null
+    // && matrizProducao[testarCadeiaArray.regra.size() -
+    // 1][0].contem(primeiraRegra)) {
+    // return true;
+    // }
+
+    return matrizProducao[0][testarCadeiaArray.regra.size() - 1] != null
+        && matrizProducao[0][testarCadeiaArray.regra.size() - 1].contem(primeiraRegra);
+  }
+
+  public boolean fazerCykModificado(String testarCadeia) {
+
+    if (testarCadeia.isEmpty() || testarCadeia.equals(vazio)) {
+      return gramatica.get(primeiraRegra).contem(vazio);
+    }
+
     var regraCadeiTeste = new Regras();
     var testarCadeiaArray = regraCadeiTeste.inserirArrayRegra(testarCadeia);
 
@@ -263,7 +350,6 @@ public class Gramatica {
     for (int i = 2; i <= testarCadeiaArray.regra.size(); i++) {
       for (int j = 1; j <= testarCadeiaArray.regra.size() - i + 1; j++) {
         for (int k = 1, m = i - 2, n = j; k < i; k++, m--, n++) {
-
           if (!(matrizProducao[k - 1][j - 1] == null || matrizProducao[m][n].regras == null)) {
             for (var var1 : matrizProducao[k - 1][j - 1].regras) {
               for (var var2 : matrizProducao[m][n].regras) {
@@ -290,12 +376,14 @@ public class Gramatica {
     }
 
     // }
-    if (matrizProducao[testarCadeiaArray.regra.size() - 1][0] != null
-        && matrizProducao[testarCadeiaArray.regra.size() - 1][0].contem(primeiraRegra)) {
-      return true;
-    }
+    // if (matrizProducao[testarCadeiaArray.regra.size() - 1][0] != null
+    // && matrizProducao[testarCadeiaArray.regra.size() -
+    // 1][0].contem(primeiraRegra)) {
+    // return true;
+    // }
 
-    return false;
+    return matrizProducao[testarCadeiaArray.regra.size() - 1][0] != null
+        && matrizProducao[testarCadeiaArray.regra.size() - 1][0].contem(primeiraRegra);
   }
 
   // for (Map.Entry<String, Regras> regra : gramatica.entrySet()) {
