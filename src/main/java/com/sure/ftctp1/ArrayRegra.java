@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class ArrayRegra implements Cloneable {
   String regraCompleta = "";
-  ArrayList<String> regra = new ArrayList<String>();
+  ArrayList<String> regraDividida = new ArrayList<>();
 
   // ArrayRegra(String regraCompleta) {
   // this.regraCompleta = regraCompleta;
@@ -15,10 +15,16 @@ public class ArrayRegra implements Cloneable {
   }
 
   void inserirVariavel(String variavel) {
-    regra.add(variavel);
+    regraDividida.add(variavel);
     regraCompleta += "" + variavel;
   }
 
+  void atualizarRegraCompleta() {
+    regraCompleta = "";
+    for (String variavel : regraDividida) {
+      regraCompleta += variavel;
+    }
+  }
   // @Override
   // public ArrayRegra clone() throws CloneNotSupportedException {
   // // regra = new ArrayList<String>();
@@ -27,7 +33,7 @@ public class ArrayRegra implements Cloneable {
 
   public ArrayRegra clone() {
     var cloreArrayRegra = new ArrayRegra();
-    cloreArrayRegra.regra.addAll(regra);
+    cloreArrayRegra.regraDividida.addAll(regraDividida);
     cloreArrayRegra.regraCompleta = regraCompleta;
     return cloreArrayRegra;
   }

@@ -15,8 +15,8 @@ public class Regras {
 
   public void removerRegra(String deletar) {
     for (int i = 0; i < regras.size(); i++) {
-      for (int j = 0; j < regras.get(i).regra.size(); j++) {
-        if (regras.get(i).regra.get(j).equals(deletar)) {
+      for (int j = 0; j < regras.get(i).regraDividida.size(); j++) {
+        if (regras.get(i).regraDividida.get(j).equals(deletar)) {
           regras.remove(i);
           return;
         }
@@ -41,6 +41,20 @@ public class Regras {
     return a;
   }
 
+  public ArrayRegra inserirArrayString(ArrayList<String> inserir) {
+    var a = new ArrayRegra();
+    for (String string : inserir) {
+      a.inserirVariavel(string);
+    }
+    return a;
+  }
+
+  public ArrayRegra inserirVariaveis(ArrayList<String> inserir) {
+    var a = inserirArrayString(inserir);
+    regras.add(a);
+    return a;
+  }
+
   public ArrayRegra inserirVariaveis(String regra) {
     var a = inserirArrayRegra(regra);
     regras.add(a);
@@ -49,7 +63,7 @@ public class Regras {
 
   public boolean contemArray(String contem) {
     for (ArrayRegra arrayRegra : regras) {
-      if (arrayRegra.regra.contains(contem)) {
+      if (arrayRegra.regraDividida.contains(contem)) {
         return true;
       }
     }
