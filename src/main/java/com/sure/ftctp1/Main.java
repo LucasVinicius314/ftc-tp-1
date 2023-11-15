@@ -21,15 +21,22 @@ public class Main {
     // gramatica.inserirMuitasRegras("B", "CC b");
     // gramatica.inserirMuitasRegras("C", "a AB");
 
+    Gramatica gramatica = new Gramatica("S", "nLn");
+    gramatica.inserirMuitasRegras("L", "LE ?");
+    gramatica.inserirMuitasRegras("E", "a L");
+
     // var gramatica =
     // readGrammar("E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\a.txt");
 
-    // Gramatica gramatica = new Gramatica("S", "SE a AX AB");
+    // Gramatica gramatica = new Gramatica("S", "SE a AX AB K");
     // gramatica.inserirMuitasRegras("L", "a BA");
     // gramatica.inserirMuitasRegras("E", "a AX AB");
     // gramatica.inserirMuitasRegras("A", "h");
     // gramatica.inserirMuitasRegras("B", "k");
     // gramatica.inserirMuitasRegras("X", "SB");
+    // gramatica.inserirMuitasRegras("K", "H");
+    // gramatica.inserirMuitasRegras("H", "I");
+    // gramatica.inserirMuitasRegras("I", "K");
 
     // gramatica.inserirMuitasRegras("D", "a ?");
     // gramatica.inserirMuitasRegras("K", "b");
@@ -37,8 +44,11 @@ public class Main {
     // gramatica.inserirMuitasRegras("S", "SE ?");
     // gramatica.inserirMuitasRegras("E", "a L");
 
-    Gramatica gramatica = new Gramatica("S", "BaBaB");
-    gramatica.inserirMuitasRegras("B", "b ?");
+    // Gramatica gramatica = new Gramatica("S", "BaBaB");
+    // gramatica.inserirMuitasRegras("B", "b ?");
+
+    // Gramatica gramatica = new Gramatica("S", "B BaB");
+    // gramatica.inserirMuitasRegras("B", "b");
 
     // // gramatica.inserirMuitasRegras("S", "Z A bN");
     // gramatica.inserirMuitasRegras("Z", "aZb b bN");
@@ -46,10 +56,11 @@ public class Main {
     // gramatica.inserirMuitasRegras("A", "aAb a aA baN");
 
     gramatica.formaNormalChomsky();
-    // eDaGramatica(gramatica, "baaba");
+    gramatica.imprimirRegras();
+
+    eDaGramatica(gramatica, "aaa");
 
     // gramatica.nunable();
-    gramatica.imprimirRegras();
     // System.out.println("Hello world");
     // System.out.println(gramatica);
 

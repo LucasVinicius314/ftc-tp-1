@@ -1,6 +1,8 @@
-S -> SE | a | AX | AB
-L -> AX | AB
-E -> a | AX | AB
-A -> (
-B -> )
-X -> SB
+S -> LT | QZ
+L -> b
+T -> QZ
+Q -> a
+Z -> LN | QU
+N -> QU
+U -> LE | QL | a
+E -> QL | a
