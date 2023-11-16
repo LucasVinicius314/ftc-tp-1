@@ -21,9 +21,9 @@ public class Main {
     // gramatica.inserirMuitasRegras("B", "CC b");
     // gramatica.inserirMuitasRegras("C", "a AB");
 
-    Gramatica gramatica = new Gramatica("S", "nLn");
+    Gramatica gramatica = new Gramatica("S", "(L)");
     gramatica.inserirMuitasRegras("L", "LE ?");
-    gramatica.inserirMuitasRegras("E", "a L");
+    gramatica.inserirMuitasRegras("E", "a S");
 
     // var gramatica =
     // readGrammar("E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\a.txt");
@@ -58,7 +58,7 @@ public class Main {
     gramatica.formaNormalChomsky();
     gramatica.imprimirRegras();
 
-    eDaGramatica(gramatica, "aaa");
+    eDaGramatica(gramatica, "(a)");
 
     // gramatica.nunable();
     // System.out.println("Hello world");

@@ -98,10 +98,17 @@ public class Gramatica {
 
   public void formaNormalChomsky() throws CloneNotSupportedException {
     tirarInuteis();
+    imprimirRegras();
+    System.out.println("--------------");
     binario();
     imprimirRegras();
     tirarVazio();
+    System.out.println("Tirou vazio");
+    imprimirRegras();
+    System.out.println("--------------");
     trocarTerminal();
+    imprimirRegras();
+    System.out.println("--------------");
     removerRegraUnidade();
   }
 
@@ -190,7 +197,7 @@ public class Gramatica {
         }
       }
     }
-
+    // imprimirRegras();
     tirarInuteis();
   }
 
@@ -267,15 +274,20 @@ public class Gramatica {
 
       for (var regra : gramatica.entrySet()) {
         if (!termina.contains(regra.getKey())) {
-          var adicionar = true;
+          var adicionar = false;
           for (var segmentoRegra : regra.getValue().regras) {
+            var add = true;
             for (String caractereRegra : segmentoRegra.regraDividida) {
-              if (!termina.contains(caractereRegra)) {
-                adicionar = false;
+              if (!termina.contains(caractereRegra) && !terminais.contains(caractereRegra)) {
+                add = false;
                 break;
               }
             }
+            if (add) {
+              adicionar = true;
+            }
           }
+
           if (adicionar) {
             termina.add(regra.getKey());
             regraInutil.remove(regra.getKey());
@@ -295,6 +307,7 @@ public class Gramatica {
   public void tirarInuteis() {
 
     tirarNaoTermina();
+    // imprimirRegras();
     ArrayList<String> irAinda = new ArrayList<>();
 
     irAinda.add(primeiraRegra);
@@ -499,6 +512,7 @@ public class Gramatica {
 
   public void tirarVazio() throws CloneNotSupportedException {
     var temVazio = new ArrayList<String>();
+    var tirouVazio = new ArrayList<String>();
     var naoTemVazio = new ArrayList<String>();
     novaPrimeiraRegra();
 
@@ -514,6 +528,7 @@ public class Gramatica {
       // var remover = new ArrayList<String>();
       for (int j = 0; j < temVazio.size(); j++) {
         var chaveVazio = temVazio.get(j);
+        tirouVazio.add(chaveVazio);
         // for (String chaveVazio : temVazio) {
 
         for (var regrasOlhar : gramatica.entrySet()) {
@@ -533,16 +548,23 @@ public class Gramatica {
             }
             if (lugaresOlha.size() > 0) {
               novasRegras = frasesComVazio(regrasOlhar.getKey(), lugaresOlha, arrayDaRegra, regrasOlhar);
-              if (novasRegras.size() > 0)
+              if (novasRegras.size() > 0) {
                 if (novasRegras.get(novasRegras.size() - 1).regraCompleta.equals(vazio)) {
+
                   if (!temVazio.contains(regrasOlhar.getKey())) {
                     naoTemVazio.remove(regrasOlhar.getKey());
                     // remover.add(regrasOlhar.getKey());
                     temVazio.add(regrasOlhar.getKey());
                   }
+                  if (tirouVazio.contains(regrasOlhar.getKey())) {
+                    novasRegras.remove(novasRegras.size() - 1);
+                  }
                 }
+
+              }
             }
           }
+
           regraOlhando.addAll(novasRegras);
         }
         if (!naoTemVazio.contains(chaveVazio)) {
