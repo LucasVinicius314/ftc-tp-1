@@ -11,8 +11,17 @@ public class Main {
 
   public static void main(String[] args) throws Exception {
 
-    // Gramatica gramatica = new Gramatica("L", "SaSaSaS");
-    // gramatica.inserirMuitasRegras("S", "b ?");
+    // S -> LT | QZ
+    // L -> b
+    // T -> QZ
+    // Q -> a
+    // Z -> LN | QU
+    // N -> QU
+    // U -> LE | QL | a
+    // E -> QL | a
+
+    Gramatica gramatica = new Gramatica("L", "SaSaSaS");
+    gramatica.inserirMuitasRegras("S", "bc");
     // Gramatica gramatica = new Gramatica("L", "SaSaSaS ?");
     // gramatica.inserirMuitasRegras("S", "b");
 
@@ -21,9 +30,12 @@ public class Main {
     // gramatica.inserirMuitasRegras("B", "CC b");
     // gramatica.inserirMuitasRegras("C", "a AB");
 
-    Gramatica gramatica = new Gramatica("S", "(L)");
-    gramatica.inserirMuitasRegras("L", "LE ?");
-    gramatica.inserirMuitasRegras("E", "a S");
+    // Gramatica gramatica = new Gramatica("S", "(L)");
+    // gramatica.inserirMuitasRegras("L", "LE ? A KE KEZ");
+    // gramatica.inserirMuitasRegras("E", "a S S S");
+    // gramatica.inserirMuitasRegras("A", "Ea");
+    // gramatica.inserirMuitasRegras("Z", "b S Eb");
+    // gramatica.inserirMuitasRegras("K", "a aK");
 
     // var gramatica =
     // readGrammar("E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\a.txt");
@@ -58,7 +70,9 @@ public class Main {
     gramatica.formaNormalChomsky();
     gramatica.imprimirRegras();
 
-    eDaGramatica(gramatica, "(a)");
+    eDaGramatica(gramatica, "aaabbb");
+    eDaGramatica(gramatica, "ababab");
+    eDaGramatica(gramatica, "bbbaaa");
 
     // gramatica.nunable();
     // System.out.println("Hello world");

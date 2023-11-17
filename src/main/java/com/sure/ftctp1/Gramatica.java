@@ -98,17 +98,22 @@ public class Gramatica {
 
   public void formaNormalChomsky() throws CloneNotSupportedException {
     tirarInuteis();
+    System.out.println("Tirou inutil");
     imprimirRegras();
     System.out.println("--------------");
+    System.out.println("Binario");
     binario();
     imprimirRegras();
+    System.out.println("--------------");
     tirarVazio();
     System.out.println("Tirou vazio");
     imprimirRegras();
     System.out.println("--------------");
     trocarTerminal();
+    System.out.println("Trocou terminais por não terminal");
     imprimirRegras();
     System.out.println("--------------");
+    System.out.println("Tirou regras de não terminal solo");
     removerRegraUnidade();
   }
 
@@ -142,9 +147,9 @@ public class Gramatica {
         }
 
         for (int i = 0; i < umElemento.size(); i++) {
-          var regra = gramatica.get(regras.getValue().regras.get(umElemento.get(i)).regraCompleta);
+          var regra = gramatica.get(regras.getValue().regras.get(umElemento.get(i) - i).regraCompleta);
           var regrasSubstituir = copiarRegras(regra);
-          regras.getValue().removerRegraCompleta(regras.getValue().regras.get(umElemento.get(i)).regraCompleta);
+          regras.getValue().removerRegraCompleta(umElemento.get(i) - i);
           regras.getValue().regras.addAll(regrasSubstituir);
 
         }
@@ -260,13 +265,28 @@ public class Gramatica {
     ArrayList<String> termina = new ArrayList<>();
 
     for (var regra : gramatica.entrySet()) {
+      for (var arrayRegra : regra.getValue().regras) {
+        boolean tentaTerminar = true;
 
-      for (String terminal : terminais) {
-        if (regra.getValue().contem(terminal)) {
+        for (var letra : arrayRegra.regraDividida) {
+          if (!terminais.contains(letra)) {
+            tentaTerminar = false;
+            break;
+          }
+        }
+
+        if (tentaTerminar) {
           termina.add(regra.getKey());
           break;
         }
       }
+
+      // for (String terminal : terminais) {
+      // if (regra.getValue().contem(terminal)) {
+      // termina.add(regra.getKey());
+      // break;
+      // }
+      // }
     }
 
     ArrayList<String> regraInutil = new ArrayList<>();
@@ -304,8 +324,29 @@ public class Gramatica {
     }
   }
 
+  public void limparRegraIgual() {
+
+    for (var regras : gramatica.entrySet()) {
+      ArrayList<String> regraUnicas = new ArrayList<>();
+      ArrayList<Integer> regraRemover = new ArrayList<>();
+      int i = 0;
+      for (var regra : regras.getValue().regras) {
+        if (!regraUnicas.contains(regra.regraCompleta)) {
+          regraUnicas.add(regra.regraCompleta);
+        } else {
+          regraRemover.add(i);
+        }
+        i++;
+      }
+      for (int j = 0; j < regraRemover.size(); j++) {
+        regras.getValue().regras.remove(regraRemover.get(j) - j);
+      }
+    }
+  }
+
   public void tirarInuteis() {
 
+    limparRegraIgual();
     tirarNaoTermina();
     // imprimirRegras();
     ArrayList<String> irAinda = new ArrayList<>();
@@ -569,7 +610,10 @@ public class Gramatica {
         }
         if (!naoTemVazio.contains(chaveVazio)) {
           naoTemVazio.add(chaveVazio);
-          gramatica.get(chaveVazio).removerRegra(vazio);
+
+          if (!chaveVazio.equals(primeiraRegra))
+            gramatica.get(chaveVazio).removerRegra(vazio);
+
           if (gramatica.get(chaveVazio).regras.isEmpty())
             tirarGramatica(chaveVazio);
         }

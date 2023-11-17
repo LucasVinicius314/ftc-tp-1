@@ -22,6 +22,16 @@ public class Regras {
     }
   }
 
+  public void removerRegraCompleta(int posicao) {
+    regras.remove(posicao);
+    // for (int i = 0; i < regras.size(); i++) {
+    // if (regras.get(i).regraCompleta.equals(deletar)) {
+    // regras.remove(i);
+    // return;
+    // }
+    // }
+  }
+
   public void removerRegra(String deletar) {
     for (int i = 0; i < regras.size(); i++) {
       for (int j = 0; j < regras.get(i).regraDividida.size(); j++) {

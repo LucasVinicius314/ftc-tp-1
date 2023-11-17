@@ -1,8 +1,1 @@
-S -> LT | QZ
-L -> b
-T -> QZ
-Q -> a
-Z -> LN | QU
-N -> QU
-U -> LE | QL | a
-E -> QL | a
+S -> aSb aSa bSa bSb ?
