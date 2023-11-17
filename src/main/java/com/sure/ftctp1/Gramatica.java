@@ -280,13 +280,6 @@ public class Gramatica {
           break;
         }
       }
-
-      // for (String terminal : terminais) {
-      // if (regra.getValue().contem(terminal)) {
-      // termina.add(regra.getKey());
-      // break;
-      // }
-      // }
     }
 
     ArrayList<String> regraInutil = new ArrayList<>();
