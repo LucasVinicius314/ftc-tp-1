@@ -3,7 +3,7 @@ package com.sure.ftctp1;
 import java.util.ArrayList;
 
 public class Regras {
-  ArrayList<ArrayRegra> regras = new ArrayList<>();
+  ArrayList<Regra> listaRegras = new ArrayList<>();
 
   Regras(String regras) {
     // regras.add(regras);
@@ -14,16 +14,16 @@ public class Regras {
   }
 
   public void removerRegraCompleta(String deletar) {
-    for (int i = 0; i < regras.size(); i++) {
-      if (regras.get(i).regraCompleta.equals(deletar)) {
-        regras.remove(i);
+    for (int i = 0; i < listaRegras.size(); i++) {
+      if (listaRegras.get(i).regraCompleta.equals(deletar)) {
+        listaRegras.remove(i);
         return;
       }
     }
   }
 
   public void removerRegraCompleta(int posicao) {
-    regras.remove(posicao);
+    listaRegras.remove(posicao);
     // for (int i = 0; i < regras.size(); i++) {
     // if (regras.get(i).regraCompleta.equals(deletar)) {
     // regras.remove(i);
@@ -33,18 +33,18 @@ public class Regras {
   }
 
   public void removerRegra(String deletar) {
-    for (int i = 0; i < regras.size(); i++) {
-      for (int j = 0; j < regras.get(i).regraDividida.size(); j++) {
-        if (regras.get(i).regraDividida.get(j).equals(deletar)) {
-          regras.remove(i);
+    for (int i = 0; i < listaRegras.size(); i++) {
+      for (int j = 0; j < listaRegras.get(i).regraDividida.size(); j++) {
+        if (listaRegras.get(i).regraDividida.get(j).equals(deletar)) {
+          listaRegras.remove(i);
           return;
         }
       }
     }
   }
 
-  public ArrayRegra inserirArrayRegra(String regra) {
-    var a = new ArrayRegra();
+  public Regra inserirArrayRegra(String regra) {
+    var a = new Regra();
     String palavra = "" + regra.charAt(0);
 
     for (int j = 1; j < regra.length(); j++) {
@@ -60,28 +60,28 @@ public class Regras {
     return a;
   }
 
-  public ArrayRegra inserirArrayString(ArrayList<String> inserir) {
-    var a = new ArrayRegra();
+  public Regra inserirArrayString(ArrayList<String> inserir) {
+    var a = new Regra();
     for (String string : inserir) {
       a.inserirVariavel(string);
     }
     return a;
   }
 
-  public ArrayRegra inserirVariaveis(ArrayList<String> inserir) {
+  public Regra inserirVariaveis(ArrayList<String> inserir) {
     var a = inserirArrayString(inserir);
-    regras.add(a);
+    listaRegras.add(a);
     return a;
   }
 
-  public ArrayRegra inserirVariaveis(String regra) {
+  public Regra inserirVariaveis(String regra) {
     var a = inserirArrayRegra(regra);
-    regras.add(a);
+    listaRegras.add(a);
     return a;
   }
 
   public boolean contemArray(String contem) {
-    for (ArrayRegra arrayRegra : regras) {
+    for (Regra arrayRegra : listaRegras) {
       if (arrayRegra.regraDividida.contains(contem)) {
         return true;
       }
@@ -90,7 +90,7 @@ public class Regras {
   }
 
   public boolean contem(String contem) {
-    for (ArrayRegra arrayRegra : regras) {
+    for (Regra arrayRegra : listaRegras) {
       if (arrayRegra.regraCompleta.length() == contem.length() && arrayRegra.regraCompleta.contains(contem)) {
         return true;
       }
@@ -99,19 +99,19 @@ public class Regras {
   }
 
   public void imprimirRegras() {
-    if (regras.size() == 1) {
+    if (listaRegras.size() == 1) {
       System.out.print(" ");
-      for (ArrayRegra arrayRegra : regras) {
+      for (Regra arrayRegra : listaRegras) {
         System.out.print(arrayRegra.regraCompleta);
       }
       System.out.print(" ");
-    } else if (regras.size() == 2) {
+    } else if (listaRegras.size() == 2) {
       System.out.print(" ");
-      for (ArrayRegra arrayRegra : regras) {
+      for (Regra arrayRegra : listaRegras) {
         System.out.print(arrayRegra.regraCompleta);
       }
     } else {
-      for (ArrayRegra arrayRegra : regras) {
+      for (Regra arrayRegra : listaRegras) {
         System.out.print(arrayRegra.regraCompleta);
       }
     }

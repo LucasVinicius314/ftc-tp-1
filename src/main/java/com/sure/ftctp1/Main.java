@@ -21,10 +21,18 @@ public class Main {
     // E -> QL | a
 
     Gramatica gramatica = new Gramatica("L", "SaSaSaS");
-    gramatica.inserirMuitasRegras("S", "bc");
-    // Gramatica gramatica = new Gramatica("L", "SaSaSaS ?");
-    // gramatica.inserirMuitasRegras("S", "b");
+    gramatica.inserirMuitasRegras("S", "b ?");
+    // Gramatica gramatica = new Gramatica("L", "SSSS");
+    // gramatica.inserirMuitasRegras("S", "b ?");
 
+    // Gramatica gramatica = new Gramatica("S", "KG BC");
+    // // gramatica.inserirMuitasRegras("A", "CC a");
+    // // gramatica.inserirMuitasRegras("B", "CC a");
+    // gramatica.inserirMuitasRegras("K", "a CC");
+    // gramatica.inserirMuitasRegras("G", "CC a");
+    // // gramatica.inserirMuitasRegras("C", "b");
+
+    // gramatica.
     // Gramatica gramatica = new Gramatica("S", "AB BC");
     // gramatica.inserirMuitasRegras("A", "a BA");
     // gramatica.inserirMuitasRegras("B", "CC b");
@@ -70,8 +78,8 @@ public class Main {
     gramatica.formaNormalChomsky();
     gramatica.imprimirRegras();
 
-    eDaGramatica(gramatica, "aaabbb");
-    eDaGramatica(gramatica, "ababab");
+    eDaGramatica(gramatica, "aaab");
+    eDaGramatica(gramatica, "bababab");
     eDaGramatica(gramatica, "bbbaaa");
 
     // gramatica.nunable();

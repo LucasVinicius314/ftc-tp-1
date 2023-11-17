@@ -37,7 +37,7 @@ public class Gramatica {
 
   private void inserirRegra(String naoTerminal, String regra) {
     if (!regra.equals("") && !naoTerminal.equals(regra)) {
-      ArrayRegra variaveis = new ArrayRegra();
+      Regra variaveis = new Regra();
 
       if (gramatica.containsKey(naoTerminal)) {
         variaveis = gramatica.get(naoTerminal).inserirVariaveis(regra);
@@ -58,7 +58,7 @@ public class Gramatica {
   }
 
   private void inserirRegra(String naoTerminal, ArrayList<String> inserir) {
-    ArrayRegra variaveis = new ArrayRegra();
+    Regra variaveis = new Regra();
     if (!inserir.isEmpty()) {
 
       if (gramatica.containsKey(naoTerminal)) {
@@ -97,10 +97,11 @@ public class Gramatica {
   }
 
   public void formaNormalChomsky() throws CloneNotSupportedException {
-    tirarInuteis();
+    removerInuteis();
     System.out.println("Tirou inutil");
     imprimirRegras();
     System.out.println("--------------");
+
     System.out.println("Binario");
     binario();
     imprimirRegras();
@@ -109,19 +110,23 @@ public class Gramatica {
     System.out.println("Tirou vazio");
     imprimirRegras();
     System.out.println("--------------");
+
     trocarTerminal();
     System.out.println("Trocou terminais por não terminal");
     imprimirRegras();
     System.out.println("--------------");
+
     System.out.println("Tirou regras de não terminal solo");
     removerRegraUnidade();
+
+    removerInuteis();
   }
 
-  public ArrayList<ArrayRegra> copiarRegras(Regras regrasCopiar) {
-    ArrayList<ArrayRegra> regrasCopiada = new ArrayList<>();
+  public ArrayList<Regra> copiarRegras(Regras regrasCopiar) {
+    ArrayList<Regra> regrasCopiada = new ArrayList<>();
 
-    for (ArrayRegra arrayRegra : regrasCopiar.regras) {
-      regrasCopiada.add(arrayRegra.clone());
+    for (Regra regra : regrasCopiar.listaRegras) {
+      regrasCopiada.add(regra.clone());
     }
 
     return regrasCopiada;
@@ -136,7 +141,7 @@ public class Gramatica {
         var umElemento = menoQueDois(regras.getValue());
 
         for (int i = 0; i < umElemento.size(); i++) {
-          if (terminais.contains(regras.getValue().regras.get(umElemento.get(i)).regraCompleta)) {
+          if (terminais.contains(regras.getValue().listaRegras.get(umElemento.get(i)).regraCompleta)) {
             umElemento.remove(i);
             i--;
           }
@@ -147,27 +152,28 @@ public class Gramatica {
         }
 
         for (int i = 0; i < umElemento.size(); i++) {
-          var regra = gramatica.get(regras.getValue().regras.get(umElemento.get(i) - i).regraCompleta);
+          var regra = gramatica.get(regras.getValue().listaRegras.get(umElemento.get(i) - i).regraCompleta);
           var regrasSubstituir = copiarRegras(regra);
           regras.getValue().removerRegraCompleta(umElemento.get(i) - i);
-          regras.getValue().regras.addAll(regrasSubstituir);
+          regras.getValue().listaRegras.addAll(regrasSubstituir);
 
         }
       }
     }
 
-    tirarInuteis();
+    // removerInuteis();
   }
 
   public void trocarTerminal() {
     HashMap<String, Regras> geradorTerminais = new HashMap<>();
     for (var regras : gramatica.entrySet()) {
-      if (regras.getValue().regras.size() == 1 && terminais.contains(regras.getValue().regras.get(0).regraCompleta)) {
-        if (!geradorTerminais.containsKey(regras.getValue().regras.get(0).regraCompleta)) {
+      if (regras.getValue().listaRegras.size() == 1
+          && terminais.contains(regras.getValue().listaRegras.get(0).regraCompleta)) {
+        if (!geradorTerminais.containsKey(regras.getValue().listaRegras.get(0).regraCompleta)) {
           var regra = new Regras(regras.getKey());
-          geradorTerminais.put(regras.getValue().regras.get(0).regraCompleta, regra);
+          geradorTerminais.put(regras.getValue().listaRegras.get(0).regraCompleta, regra);
         } else {
-          geradorTerminais.get(regras.getValue().regras.get(0).regraCompleta).inserirArrayRegra(regras.getKey());
+          geradorTerminais.get(regras.getValue().listaRegras.get(0).regraCompleta).inserirArrayRegra(regras.getKey());
         }
       }
     }
@@ -183,8 +189,8 @@ public class Gramatica {
     }
 
     for (var regras : gramatica.entrySet()) {
-      for (int j = 0; j < regras.getValue().regras.size(); j++) {
-        var regra = regras.getValue().regras.get(j);
+      for (int j = 0; j < regras.getValue().listaRegras.size(); j++) {
+        var regra = regras.getValue().listaRegras.get(j);
         if (regra.regraDividida.size() > 1) {
           for (int i = 0; i < regra.regraDividida.size(); i++) {
 
@@ -193,7 +199,7 @@ public class Gramatica {
             if (geradorTerminais.containsKey(letra)) {
 
               regra.regraDividida.remove(i);
-              regra.regraDividida.add(i, geradorTerminais.get(letra).regras.get(0).regraCompleta);
+              regra.regraDividida.add(i, geradorTerminais.get(letra).listaRegras.get(0).regraCompleta);
               regra.atualizarRegraCompleta();
 
             }
@@ -203,7 +209,7 @@ public class Gramatica {
       }
     }
     // imprimirRegras();
-    tirarInuteis();
+    removerInuteis();
   }
 
   public void binario() {
@@ -222,7 +228,7 @@ public class Gramatica {
       var posicaoMairoDois = maiorQueDois(regraIr);
 
       while (!posicaoMairoDois.isEmpty()) {
-        var regra = regraIr.regras.get(posicaoMairoDois.get(0));
+        var regra = regraIr.listaRegras.get(posicaoMairoDois.get(0));
         String restoRegra = "";
 
         for (int i = 1; i < regra.regraDividida.size();) {
@@ -245,8 +251,8 @@ public class Gramatica {
 
   public ArrayList<Integer> maiorQueDois(Regras regras) {
     ArrayList<Integer> posicao = new ArrayList<>();
-    for (int i = 0; i < regras.regras.size(); i++) {
-      if (regras.regras.get(i).regraDividida.size() > 2)
+    for (int i = 0; i < regras.listaRegras.size(); i++) {
+      if (regras.listaRegras.get(i).regraDividida.size() > 2)
         posicao.add(i);
     }
     return posicao;
@@ -254,21 +260,27 @@ public class Gramatica {
 
   public ArrayList<Integer> menoQueDois(Regras regras) {
     ArrayList<Integer> posicao = new ArrayList<>();
-    for (int i = 0; i < regras.regras.size(); i++) {
-      if (regras.regras.get(i).regraDividida.size() < 2)
+    for (int i = 0; i < regras.listaRegras.size(); i++) {
+      if (regras.listaRegras.get(i).regraDividida.size() < 2)
         posicao.add(i);
     }
     return posicao;
   }
 
-  public void tirarNaoTermina() {
+  public void removerRegraNaoTermina() {
+    // Regras quem não chegam em terminais Não sao uteis, pois ficam em loop
+    // infinito
+    // S -> A | K
+    // A -> ac
+    // K -> L
+    // L -> K
     ArrayList<String> termina = new ArrayList<>();
 
-    for (var regra : gramatica.entrySet()) {
-      for (var arrayRegra : regra.getValue().regras) {
+    for (var regras : gramatica.entrySet()) {
+      for (var listaRegra : regras.getValue().listaRegras) {
         boolean tentaTerminar = true;
 
-        for (var letra : arrayRegra.regraDividida) {
+        for (var letra : listaRegra.regraDividida) {
           if (!terminais.contains(letra)) {
             tentaTerminar = false;
             break;
@@ -276,7 +288,7 @@ public class Gramatica {
         }
 
         if (tentaTerminar) {
-          termina.add(regra.getKey());
+          termina.add(regras.getKey());
           break;
         }
       }
@@ -288,7 +300,7 @@ public class Gramatica {
       for (var regra : gramatica.entrySet()) {
         if (!termina.contains(regra.getKey())) {
           var adicionar = false;
-          for (var segmentoRegra : regra.getValue().regras) {
+          for (var segmentoRegra : regra.getValue().listaRegras) {
             var add = true;
             for (String caractereRegra : segmentoRegra.regraDividida) {
               if (!termina.contains(caractereRegra) && !terminais.contains(caractereRegra)) {
@@ -313,17 +325,76 @@ public class Gramatica {
       }
     }
     for (String regraTirar : regraInutil) {
-      tirarGramatica(regraTirar);
+      removerGramatica(regraTirar);
     }
   }
 
-  public void limparRegraIgual() {
+  public void removerNaoTerminalIgual() {
+    HashMap<String, String> trocar = new HashMap<>();
 
+    for (var listaregras1 : gramatica.entrySet()) {
+      for (var listaregras2 : gramatica.entrySet()) {
+        if (listaregras1 == listaregras2)
+          continue;
+
+        boolean pular = false;
+
+        for (var regra2 : listaregras2.getValue().listaRegras) {
+
+          boolean podePularTroca = true;
+          for (var trocarKey : trocar.entrySet()) {
+            if (regra2.regraDividida.contains(trocarKey.getKey())) {
+              podePularTroca = false;
+              break;
+            }
+          }
+
+          for (int i = 0; i < regra2.regraDividida.size(); i++) {
+            if (listaregras1.getValue().listaRegras.size() != listaregras2.getValue().listaRegras.size()
+                || !listaregras1.getValue().contem(regra2.regraCompleta)) {
+              pular = true;
+              if (podePularTroca) {
+                break;
+              }
+            }
+
+            var letraTrocar = trocar.get(regra2.regraDividida.get(i));
+            if (letraTrocar != null) {
+              regra2.regraDividida.remove(i);
+              regra2.regraDividida.add(i, letraTrocar);
+            }
+          }
+
+          if (!podePularTroca) {
+            regra2.atualizarRegraCompleta();
+          }
+        }
+
+        if (pular) {
+          continue;
+        } else {
+          if (!trocar.containsKey(listaregras1.getKey())) {
+            trocar.put(listaregras2.getKey(), listaregras1.getKey());
+          } else {
+            if (!listaregras2.getKey().equals(trocar.get(listaregras1.getKey())))
+              trocar.put(listaregras2.getKey(), trocar.get(listaregras1.getKey()));
+          }
+        }
+
+      }
+
+    }
+
+  }
+
+  public void removerRegraIgual() {
+    // S - > A | BA | BA
+    // FICA : S - > A | BA
     for (var regras : gramatica.entrySet()) {
       ArrayList<String> regraUnicas = new ArrayList<>();
       ArrayList<Integer> regraRemover = new ArrayList<>();
       int i = 0;
-      for (var regra : regras.getValue().regras) {
+      for (var regra : regras.getValue().listaRegras) {
         if (!regraUnicas.contains(regra.regraCompleta)) {
           regraUnicas.add(regra.regraCompleta);
         } else {
@@ -332,15 +403,16 @@ public class Gramatica {
         i++;
       }
       for (int j = 0; j < regraRemover.size(); j++) {
-        regras.getValue().regras.remove(regraRemover.get(j) - j);
+        regras.getValue().listaRegras.remove(regraRemover.get(j) - j);
       }
     }
   }
 
-  public void tirarInuteis() {
+  public void removerInuteis() {
 
-    limparRegraIgual();
-    tirarNaoTermina();
+    removerRegraIgual();
+    removerRegraNaoTermina();
+    removerNaoTerminalIgual();
     // imprimirRegras();
     ArrayList<String> irAinda = new ArrayList<>();
 
@@ -349,17 +421,17 @@ public class Gramatica {
 
     while (i < irAinda.size()) {
       var regras = gramatica.get(irAinda.get(i++));
-      for (int j = 0; j < regras.regras.size(); j++) {
-        var arrayRegra = regras.regras.get(j);
-        for (String segmento : arrayRegra.regraDividida) {
+      for (int j = 0; j < regras.listaRegras.size(); j++) {
+        var regra = regras.listaRegras.get(j);
+        for (String segmento : regra.regraDividida) {
           if (!irAinda.contains(segmento) && gramatica.containsKey(segmento)) {
             irAinda.add(segmento);
           } else if (!gramatica.containsKey(segmento) && Character.isUpperCase(segmento.charAt(0))) {
-            regras.regras.remove(arrayRegra);
+            regras.listaRegras.remove(regra);
             j--;
-            if (regras.regras.isEmpty()) {
+            if (regras.listaRegras.isEmpty()) {
               gramatica.remove(irAinda.get(i - 1));
-              tirarGramatica(irAinda.get(i - 1));
+              removerGramatica(irAinda.get(i - 1));
             }
 
           }
@@ -377,33 +449,32 @@ public class Gramatica {
     for (String chaveTirar : chavesInuteis) {
       gramatica.remove(chaveTirar);
     }
-
   }
 
-  public void tirarGramatica(String chave) {
+  public void removerGramatica(String chave) {
 
     ArrayList<String> tirarGramatica = new ArrayList<>();
 
     for (var linha : gramatica.entrySet()) {
-      ArrayList<ArrayRegra> remover = new ArrayList<>();
-      for (var regra : linha.getValue().regras) {
+      ArrayList<Regra> remover = new ArrayList<>();
+      for (var regra : linha.getValue().listaRegras) {
         if (regra.regraDividida.contains(chave)) {
           // linha.getValue().regras.remove(regra);
           remover.add(regra);
         }
       }
-      for (ArrayRegra arrayRegra : remover) {
-        linha.getValue().regras.remove(arrayRegra);
+      for (Regra regra : remover) {
+        linha.getValue().listaRegras.remove(regra);
       }
 
-      if (linha.getValue().regras.isEmpty()) {
+      if (linha.getValue().listaRegras.isEmpty()) {
         tirarGramatica.add(linha.getKey());
       }
     }
 
     for (String chaveTirar : tirarGramatica) {
       gramatica.remove(chaveTirar);
-      tirarGramatica(chaveTirar);
+      removerGramatica(chaveTirar);
     }
 
   }
@@ -439,24 +510,24 @@ public class Gramatica {
     }
   }
 
-  public void adicionarNovaRegra(String chaveRegraAtual, ArrayList<ArrayRegra> novasRegras, ArrayRegra arrayInserir) {
+  public void adicionarNovaRegra(String chaveRegraAtual, ArrayList<Regra> novasRegras, Regra arrayInserir) {
 
     if (arrayInserir.regraCompleta.equals(chaveRegraAtual)) {
       return;
     }
-    for (ArrayRegra arrayRegra : novasRegras) {
-      if (arrayRegra.regraCompleta.equals(arrayInserir.regraCompleta))
+    for (var regra : novasRegras) {
+      if (regra.regraCompleta.equals(arrayInserir.regraCompleta))
         return;
     }
     novasRegras.add(arrayInserir);
 
   }
 
-  public ArrayList<ArrayRegra> frasesComVazio(String chaveRegraAtual, ArrayList<Integer> lugaresOlha,
-      ArrayRegra arrayDaRegra,
+  public ArrayList<Regra> frasesComVazio(String chaveRegraAtual, ArrayList<Integer> lugaresOlha,
+      Regra arrayDaRegra,
       Map.Entry<String, Regras> regrasOlhar) {
 
-    var novasRegras = new ArrayList<ArrayRegra>();
+    var novasRegras = new ArrayList<Regra>();
     int removidos = 0;
 
     var variacaoRegraAtual = arrayDaRegra.clone();
@@ -506,7 +577,7 @@ public class Gramatica {
 
             }
           }
-          // var var = new ArrayRegra();
+          // var var = new regra();
           // for (int j = 0; j < variaveis2.size(); j++) {
           // if (variaveis2.get(i).equals(variaveis2).get(j)) {
           // var.inserirVariavel();
@@ -525,7 +596,7 @@ public class Gramatica {
 
         } else {
           if (!regrasOlhar.getValue().contemArray(vazio)) {
-            regraAtual = new ArrayRegra();
+            regraAtual = new Regra();
             regraAtual.inserirVariavel(vazio);
             // regraAtual.atualizarRegraCompleta();
             novasRegras.add(regraAtual.clone());
@@ -566,10 +637,10 @@ public class Gramatica {
         // for (String chaveVazio : temVazio) {
 
         for (var regrasOlhar : gramatica.entrySet()) {
-          var novasRegras = new ArrayList<ArrayRegra>();
-          var regraOlhando = regrasOlhar.getValue().regras;
+          var novasRegras = new ArrayList<Regra>();
+          var regraOlhando = regrasOlhar.getValue().listaRegras;
 
-          for (ArrayRegra arrayDaRegra : regraOlhando) {
+          for (Regra arrayDaRegra : regraOlhando) {
             ArrayList<Integer> lugaresOlha = new ArrayList<Integer>();
 
             var variaveis2 = arrayDaRegra.regraDividida;
@@ -604,11 +675,13 @@ public class Gramatica {
         if (!naoTemVazio.contains(chaveVazio)) {
           naoTemVazio.add(chaveVazio);
 
+          // Primeira regra pode ter o ?
           if (!chaveVazio.equals(primeiraRegra))
             gramatica.get(chaveVazio).removerRegra(vazio);
 
-          if (gramatica.get(chaveVazio).regras.isEmpty())
-            tirarGramatica(chaveVazio);
+          // a regra acabou, so tinha vazio
+          if (gramatica.get(chaveVazio).listaRegras.isEmpty())
+            removerGramatica(chaveVazio);
         }
       }
     }
@@ -625,50 +698,19 @@ public class Gramatica {
     while (i < gramatica.size()) {
       System.out.print("" + irAinda.get(i) + " -> ");
       var regras = gramatica.get(irAinda.get(i++));
-      for (var arrayRegra : regras.regras) {
-        for (String segmento : arrayRegra.regraDividida) {
+      for (var regra : regras.listaRegras) {
+        for (String segmento : regra.regraDividida) {
           System.out.print(segmento);
           if (!irAinda.contains(segmento) && gramatica.containsKey(segmento)) {
             irAinda.add(segmento);
           }
         }
-        if (!arrayRegra.equals(regras.regras.get(regras.regras.size() - 1))) {
+        if (!regra.equals(regras.listaRegras.get(regras.listaRegras.size() - 1))) {
           System.out.print(" | ");
         }
       }
       System.out.println();
     }
-
-    // System.out.print("" + primeiraRegra + " -> ");
-
-    // for (var arrayRegra : gramatica.get(primeiraRegra).regras) {
-    // for (String segmento : arrayRegra.regraDividida) {
-    // System.out.print(segmento);
-    // }
-    // if
-    // (!arrayRegra.equals(gramatica.get(primeiraRegra).regras.get(gramatica.get(primeiraRegra).regras.size()
-    // - 1))) {
-    // System.out.print(" | ");
-    // }
-    // }
-    // System.out.println();
-    // for (var regra : gramatica.entrySet()) {
-    // if (!regra.getKey().equals(primeiraRegra)) {
-    // System.out.print("" + regra.getKey() + " -> ");
-    // for (var arrayRegra : regra.getValue().regras) {
-    // for (String segmento : arrayRegra.regraDividida) {
-    // System.out.print(segmento);
-    // }
-    // if
-    // (!arrayRegra.equals(regra.getValue().regras.get(regra.getValue().regras.size()
-    // - 1))) {
-    // System.out.print(" | ");
-    // }
-    // }
-    // }
-    // System.out.println();
-    // }
-
   }
 
   public boolean fazerCykNormal(String testarCadeia) {
@@ -703,9 +745,13 @@ public class Gramatica {
     for (int j = 2; j <= testarCadeiaArray.regraDividida.size(); j++) {
       for (int i = j - 1; i >= 1; i--) {
         for (int h = i; h <= j - 1; h++) {
-          if (!(matrizProducao[i - 1][h - 1] == null || matrizProducao[h][j - 1].regras == null)) {
-            for (var var1 : matrizProducao[i - 1][h - 1].regras) {
-              for (var var2 : matrizProducao[h][j - 1].regras) {
+          if (!(matrizProducao[i - 1][h - 1] == null || matrizProducao[h][j - 1] == null)
+          /*
+           * && !(matrizProducao[i - 1][h - 1].listaRegras == null || matrizProducao[h][j
+           * - 1].listaRegras == null)
+           */) {
+            for (var var1 : matrizProducao[i - 1][h - 1].listaRegras) {
+              for (var var2 : matrizProducao[h][j - 1].listaRegras) {
 
                 String producao = "" + var1.regraCompleta + var2.regraCompleta;
 
@@ -785,9 +831,9 @@ public class Gramatica {
     for (int i = 2; i <= testarCadeiaArray.regraDividida.size(); i++) {
       for (int j = 1; j <= testarCadeiaArray.regraDividida.size() - i + 1; j++) {
         for (int k = 1, m = i - 2, n = j; k < i; k++, m--, n++) {
-          if (!(matrizProducao[k - 1][j - 1] == null || matrizProducao[m][n].regras == null)) {
-            for (var var1 : matrizProducao[k - 1][j - 1].regras) {
-              for (var var2 : matrizProducao[m][n].regras) {
+          if (!(matrizProducao[k - 1][j - 1] == null || matrizProducao[m][n].listaRegras == null)) {
+            for (var var1 : matrizProducao[k - 1][j - 1].listaRegras) {
+              for (var var2 : matrizProducao[m][n].listaRegras) {
 
                 String producao = "" + var1.regraCompleta + var2.regraCompleta;
 
@@ -856,7 +902,7 @@ public class Gramatica {
     }
 
     for (var regras : gramatica.entrySet()) {
-      for (var regra : regras.getValue().regras) {
+      for (var regra : regras.getValue().listaRegras) {
         if (regra.regraDividida.size() == 1 && Character.isUpperCase(regra.regraDividida.get(0).charAt(0))) {
           regrasNulas.inserirRegra(regra.regraCompleta, regras.getKey());
         } else if (regra.regraDividida.size() == 2 && Character.isUpperCase(regra.regraDividida.get(0).charAt(0))
