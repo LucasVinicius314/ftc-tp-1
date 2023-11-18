@@ -20,16 +20,16 @@ public class Main {
     // U -> LE | QL | a
     // E -> QL | a
 
-    Gramatica gramatica = new Gramatica("L", "SaSaSaS");
-    gramatica.inserirMuitasRegras("S", "b ?");
+    // Gramatica gramatica = new Gramatica("L", "SaSaSaS");
+    // gramatica.inserirMuitasRegras("S", "b ?");
     // Gramatica gramatica = new Gramatica("L", "SSSS");
     // gramatica.inserirMuitasRegras("S", "b ?");
 
     // Gramatica gramatica = new Gramatica("S", "KG BC");
     // // gramatica.inserirMuitasRegras("A", "CC a");
     // // gramatica.inserirMuitasRegras("B", "CC a");
-    // gramatica.inserirMuitasRegras("K", "a CC");
-    // gramatica.inserirMuitasRegras("G", "CC a");
+    // gramatica.inserirMuitasRegras("K", "a aK");
+    // gramatica.inserirMuitasRegras("G", "aK a");
     // // gramatica.inserirMuitasRegras("C", "b");
 
     // gramatica.
@@ -45,8 +45,8 @@ public class Main {
     // gramatica.inserirMuitasRegras("Z", "b S Eb");
     // gramatica.inserirMuitasRegras("K", "a aK");
 
-    // var gramatica =
-    // readGrammar("E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\a.txt");
+    var gramatica = readGramatica(
+        "E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\gramatica.txt");
 
     // Gramatica gramatica = new Gramatica("S", "SE a AX AB K");
     // gramatica.inserirMuitasRegras("L", "a BA");

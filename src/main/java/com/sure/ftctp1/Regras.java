@@ -45,18 +45,19 @@ public class Regras {
 
   public Regra inserirArrayRegra(String regra) {
     var a = new Regra();
-    String palavra = "" + regra.charAt(0);
+    if (!regra.isEmpty()) {
+      String palavra = "" + regra.charAt(0);
 
-    for (int j = 1; j < regra.length(); j++) {
-      if (Character.isDigit(regra.charAt(j))) {
-        palavra += regra.charAt(j);
-      } else {
-        a.inserirVariavel(palavra);
-        palavra = "" + regra.charAt(j);
+      for (int j = 1; j < regra.length(); j++) {
+        if (Character.isDigit(regra.charAt(j))) {
+          palavra += regra.charAt(j);
+        } else {
+          a.inserirVariavel(palavra);
+          palavra = "" + regra.charAt(j);
+        }
       }
+      a.inserirVariavel(palavra);
     }
-
-    a.inserirVariavel(palavra);
     return a;
   }
 
@@ -75,8 +76,10 @@ public class Regras {
   }
 
   public Regra inserirVariaveis(String regra) {
+
     var a = inserirArrayRegra(regra);
     listaRegras.add(a);
+
     return a;
   }
 

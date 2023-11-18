@@ -1,1 +1,4 @@
-S -> aSb aSa bSa bSb ?
+E -> T | E+T
+T -> F | TkF
+F -> a01I | b01I | (E)
+I -> d01I | c01I | ?
