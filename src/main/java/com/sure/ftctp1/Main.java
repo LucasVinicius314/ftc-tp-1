@@ -78,9 +78,12 @@ public class Main {
     gramatica.formaNormalChomsky();
     gramatica.imprimirRegras();
 
-    eDaGramatica(gramatica, "aaab");
-    eDaGramatica(gramatica, "bababab");
-    eDaGramatica(gramatica, "bbbaaa");
+    readTesteGramatica("E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\testarFrase.txt",
+        gramatica);
+
+    // eDaGramatica(gramatica, "aaab");
+    // eDaGramatica(gramatica, "bababab");
+    // eDaGramatica(gramatica, "bbbaaa");
 
     // gramatica.nunable();
     // System.out.println("Hello world");
@@ -90,13 +93,13 @@ public class Main {
 
   public static void eDaGramatica(Gramatica gramatica, String frase) {
     if (gramatica.fazerCykNormal(frase)) {
-      System.out.println("Essa frase é da linguagem");
+      System.out.println("A frase ( " + frase + " ) é da linguagem");
     } else {
-      System.out.println("Essa frase não é da linguagem");
+      System.out.println("A frase ( " + frase + " ) não é da linguagem");
     }
   }
 
-  public static Gramatica readGrammar(String path) throws Exception {
+  public static Gramatica readGramatica(String path) throws Exception {
 
     BufferedReader br = new BufferedReader(new FileReader(path));
     Gramatica gramatica = new Gramatica();
@@ -123,6 +126,18 @@ public class Main {
 
     br.close();
     return gramatica;
+  }
+
+  public static void readTesteGramatica(String path, Gramatica gramatica) throws Exception {
+
+    BufferedReader br = new BufferedReader(new FileReader(path));
+
+    String line;
+
+    while ((line = br.readLine()) != null) {
+      eDaGramatica(gramatica, line);
+    }
+    br.close();
   }
 
 }
