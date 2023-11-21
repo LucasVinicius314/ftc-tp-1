@@ -11,18 +11,41 @@ public class Main {
 
   public static void main(String[] args) throws Exception {
 
-    // S -> LT | QZ
-    // L -> b
-    // T -> QZ
-    // Q -> a
-    // Z -> LN | QU
-    // N -> QU
-    // U -> LE | QL | a
-    // E -> QL | a
+    // As gramáticas aceitas neste programa considera todas as letras maiúsculas não
+    // terminais, seguidas ou não de números
+    // Ex: A0, B, C1, D01
 
-    // Gramatica gramatica = new Gramatica("L", "SaSaSaS");
+    // letras minúsculas e caracteres simples como () {} + são considerados
+    // terminais, seguidas ou não de números. Números NÃO são aceitos como terminais
+    // pois ele são utilizados para geração de infinitos não terminais e terminais
+    // Ex: a0, b , c1 , (01
+
+    // O caractere utilizado para representar vazio é ? (interrogação)
+
+    // Para ler uma gramatica so utilizar a função readGramatica(nomeDoArquivo)
+
+    // Ex de gramatica no formato que permite a leitura pela função:
+    // Recomento ter cuidado com espaçamento e sempre usar a ->
+    // S -> (L)
+    // L -> LE | ?
+    // E -> a | S
+
+    // Para ler os testes do CYK na gramatica, é so utilizar a função:
+    // readTesteGramatica(nomeDoArquivo,gramatica)
+
+    var gramatica = readGramatica(
+        "E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\gramatica.txt");
+
+    // Gramatica gramatica = new Gramatica("L", "aSaSaS");
     // gramatica.inserirMuitasRegras("S", "b ?");
-    // Gramatica gramatica = new Gramatica("L", "SSSS");
+
+    // Gramatica gramatica = new Gramatica("S", "aK D");
+    // gramatica.inserirMuitasRegras("K", "AB BA");
+    // gramatica.inserirMuitasRegras("A", "Aa ?");
+    // gramatica.inserirMuitasRegras("D", "BB AA");
+    // gramatica.inserirMuitasRegras("B", "Bb ?");
+
+    // Gramatica gramatica = new Gramatica("L", "SSSaS");
     // gramatica.inserirMuitasRegras("S", "b ?");
 
     // Gramatica gramatica = new Gramatica("S", "KG BC");
@@ -32,7 +55,6 @@ public class Main {
     // gramatica.inserirMuitasRegras("G", "aK a");
     // // gramatica.inserirMuitasRegras("C", "b");
 
-    // gramatica.
     // Gramatica gramatica = new Gramatica("S", "AB BC");
     // gramatica.inserirMuitasRegras("A", "a BA");
     // gramatica.inserirMuitasRegras("B", "CC b");
@@ -44,9 +66,6 @@ public class Main {
     // gramatica.inserirMuitasRegras("A", "Ea");
     // gramatica.inserirMuitasRegras("Z", "b S Eb");
     // gramatica.inserirMuitasRegras("K", "a aK");
-
-    var gramatica = readGramatica(
-        "E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\gramatica.txt");
 
     // Gramatica gramatica = new Gramatica("S", "SE a AX AB K");
     // gramatica.inserirMuitasRegras("L", "a BA");
@@ -75,13 +94,14 @@ public class Main {
     // gramatica.inserirMuitasRegras("N", "Na Nb ? bN aN");
     // gramatica.inserirMuitasRegras("A", "aAb a aA baN");
 
-    gramatica.formaNormalChomsky();
-    gramatica.imprimirRegras();
+    // gramatica.formaNormalChomsky();
+    gramatica.forma2NF();
+    // gramatica.imprimirRegras();
 
-    readTesteGramatica("E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\testarFrase.txt",
-        gramatica);
+    // readTesteGramatica("E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\testarFrase.txt",
+    // gramatica);
 
-    // eDaGramatica(gramatica, "aaab");
+    eDaGramatica(gramatica, "aaab");
     // eDaGramatica(gramatica, "bababab");
     // eDaGramatica(gramatica, "bbbaaa");
 
@@ -91,8 +111,16 @@ public class Main {
 
   }
 
+  // public static void eDaGramatica(Gramatica gramatica, String frase) {
+  // if (gramatica.fazerCykNormal(frase)) {
+  // System.out.println("A frase ( " + frase + " ) é da linguagem");
+  // } else {
+  // System.out.println("A frase ( " + frase + " ) não é da linguagem");
+  // }
+  // }
+
   public static void eDaGramatica(Gramatica gramatica, String frase) {
-    if (gramatica.fazerCykNormal(frase)) {
+    if (gramatica.fazerCykModificado(frase)) {
       System.out.println("A frase ( " + frase + " ) é da linguagem");
     } else {
       System.out.println("A frase ( " + frase + " ) não é da linguagem");

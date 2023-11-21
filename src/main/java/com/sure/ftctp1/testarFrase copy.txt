@@ -2,6 +2,7 @@ baabab
 babaab
 bababa
 baaab
+baaba
 babaa
 baaa
 ababab

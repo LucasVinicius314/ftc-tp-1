@@ -1,4 +1,4 @@
 E -> T | E+T
 T -> F | TkF
-F -> a01I | b01I | (E)
-I -> d01I | c01I | ?
+F -> aI | bI | (E)
+I -> 0I | 1I | ?

@@ -43,7 +43,7 @@ public class Regras {
     }
   }
 
-  public Regra inserirArrayRegra(String regra) {
+  public Regra inserirListaRegra(String regra) {
     var a = new Regra();
     if (!regra.isEmpty()) {
       String palavra = "" + regra.charAt(0);
@@ -77,7 +77,7 @@ public class Regras {
 
   public Regra inserirVariaveis(String regra) {
 
-    var a = inserirArrayRegra(regra);
+    var a = inserirListaRegra(regra);
     listaRegras.add(a);
 
     return a;
@@ -99,25 +99,5 @@ public class Regras {
       }
     }
     return false;
-  }
-
-  public void imprimirRegras() {
-    if (listaRegras.size() == 1) {
-      System.out.print(" ");
-      for (Regra arrayRegra : listaRegras) {
-        System.out.print(arrayRegra.regraCompleta);
-      }
-      System.out.print(" ");
-    } else if (listaRegras.size() == 2) {
-      System.out.print(" ");
-      for (Regra arrayRegra : listaRegras) {
-        System.out.print(arrayRegra.regraCompleta);
-      }
-    } else {
-      for (Regra arrayRegra : listaRegras) {
-        System.out.print(arrayRegra.regraCompleta);
-      }
-    }
-
   }
 }

@@ -9,6 +9,7 @@ public class Gramatica {
   String primeiraRegra = "";
   String vazio = "?";
   HashMap<String, Regras> gramatica = new HashMap<>();
+  HashMap<String, Regras> gramaticaReversa = new HashMap<>();
   ArrayList<String> terminais = new ArrayList<>();
 
   Gramatica(String naoTerminal, String regra) {
@@ -52,31 +53,33 @@ public class Gramatica {
         if (!Character.isUpperCase(variavel.charAt(0))
             && !terminais.contains(variavel) /* && !variavel.equals(vazio) */) {
           terminais.add(variavel);
+          gramaticaReversa.put(variavel, new Regras());
         }
       }
     }
   }
 
-  private void inserirRegra(String naoTerminal, ArrayList<String> inserir) {
-    Regra variaveis = new Regra();
-    if (!inserir.isEmpty()) {
+  // private void inserirRegra(String naoTerminal, ArrayList<String> inserir) {
+  // Regra variaveis = new Regra();
+  // if (!inserir.isEmpty()) {
 
-      if (gramatica.containsKey(naoTerminal)) {
-        variaveis = gramatica.get(naoTerminal).inserirVariaveis(inserir);
-      } else {
-        var novaRegra = new Regras();
-        variaveis = novaRegra.inserirVariaveis(inserir);
-        gramatica.put(naoTerminal, novaRegra);
+  // if (gramatica.containsKey(naoTerminal)) {
+  // variaveis = gramatica.get(naoTerminal).inserirVariaveis(inserir);
+  // } else {
+  // var novaRegra = new Regras();
+  // variaveis = novaRegra.inserirVariaveis(inserir);
+  // gramatica.put(naoTerminal, novaRegra);
 
-      }
+  // }
 
-      for (String variavel : variaveis.regraDividida) {
-        if (Character.isLowerCase(variavel.charAt(0)) && !terminais.contains(variavel)) {
-          terminais.add(variavel);
-        }
-      }
-    }
-  }
+  // for (String variavel : variaveis.regraDividida) {
+  // if (Character.isLowerCase(variavel.charAt(0)) &&
+  // !terminais.contains(variavel)) {
+  // terminais.add(variavel);
+  // }
+  // }
+  // }
+  // }
 
   public void inserirMuitasRegras(String naoTerminal, String regra) {
 
@@ -119,9 +122,46 @@ public class Gramatica {
 
     System.out.println("Tirou regras de não terminal solo");
     removerRegraUnidade();
+    removerInuteis();
+    System.out.println("--------------");
+    imprimirRegras();
+  }
+
+  public void forma2NF() {
+    removerInuteis();
+    System.out.println("Tirou inutil");
     imprimirRegras();
     System.out.println("--------------");
-    removerInuteis();
+
+    System.out.println("Binario");
+    binario();
+    imprimirRegras();
+    System.out.println("--------------");
+    gramaticaReversa();
+
+    var nulos = nullAble();
+
+    relacoesUnitarias(nulos);
+  }
+
+  public void gramaticaReversa() {
+    for (var mapRegras : gramatica.entrySet()) {
+      var regraChave = new Regra();
+      regraChave.inserirVariavel(mapRegras.getKey());
+      for (var regra : mapRegras.getValue().listaRegras) {
+        for (String letra : regra.regraDividida) {
+          if (terminais.contains(letra)) {
+            var regrareversa = gramaticaReversa.get(letra);
+
+            if (!regrareversa.listaRegras.contains(regraChave)) {
+              regrareversa.listaRegras.add(regraChave);
+            }
+          }
+        }
+
+      }
+    }
+    System.out.println();
   }
 
   public ArrayList<Regra> copiarRegras(Regras regrasCopiar) {
@@ -176,7 +216,7 @@ public class Gramatica {
           geradorTerminais.put(mapRegras.getValue().listaRegras.get(0).regraCompleta, regra);
         } else {
           geradorTerminais.get(mapRegras.getValue().listaRegras.get(0).regraCompleta)
-              .inserirArrayRegra(mapRegras.getKey());
+              .inserirListaRegra(mapRegras.getKey());
         }
       }
     }
@@ -271,8 +311,7 @@ public class Gramatica {
   }
 
   public void removerRegraNaoTermina() {
-    // Regras quem não chegam em terminais Não sao uteis, pois ficam em loop
-    // infinito
+    // Regras quem não chegam em terminais não sao uteis. pois não acabam
     // S -> A | K
     // A -> ac
     // K -> L
@@ -333,6 +372,13 @@ public class Gramatica {
   }
 
   public void removerNaoTerminalIgual() {
+    // Regras são exatamente iguais, por isso trocar o K por A
+    // S -> AK
+    // A -> Aa | a
+    // K -> Aa | a
+
+    // S -> AA
+    // A -> Aa | a
     HashMap<String, String> trocar = new HashMap<>();
 
     for (var listaregras1 : gramatica.entrySet()) {
@@ -419,7 +465,15 @@ public class Gramatica {
     removerRegraIgual();
     removerRegraNaoTermina();
     removerNaoTerminalIgual();
-    // imprimirRegras();
+
+    // Regras que não são encontradas a partir da regra inicial são inuteis
+    // S -> A
+    // A -> ac
+    // L -> a
+
+    // S -> A
+    // A -> ac
+
     ArrayList<String> irAinda = new ArrayList<>();
 
     irAinda.add(primeiraRegra);
@@ -459,22 +513,27 @@ public class Gramatica {
 
   public void removerGramatica(String chave) {
 
+    // Remove o não terminal chave de todas as regras da gramatica
+
     ArrayList<String> tirarGramatica = new ArrayList<>();
 
-    for (var linha : gramatica.entrySet()) {
+    for (var mapRegras : gramatica.entrySet()) {
       ArrayList<Regra> remover = new ArrayList<>();
-      for (var regra : linha.getValue().listaRegras) {
+
+      for (var regra : mapRegras.getValue().listaRegras) {
+        // Regras com a chave a ser removida são inuteis
         if (regra.regraDividida.contains(chave)) {
-          // linha.getValue().regras.remove(regra);
           remover.add(regra);
         }
       }
+
       for (Regra regra : remover) {
-        linha.getValue().listaRegras.remove(regra);
+        mapRegras.getValue().listaRegras.remove(regra);
       }
 
-      if (linha.getValue().listaRegras.isEmpty()) {
-        tirarGramatica.add(linha.getKey());
+      // Se a quantiade de regras ficar vazia deve ser removido da gramatica
+      if (mapRegras.getValue().listaRegras.isEmpty()) {
+        tirarGramatica.add(mapRegras.getKey());
       }
     }
 
@@ -500,6 +559,7 @@ public class Gramatica {
   }
 
   public String geradorNaoTerminal() {
+    // Gera letras não terminais aleatorias
     Random random = new Random();
     char letra = (char) ('A' + random.nextInt(26));
 
@@ -516,116 +576,139 @@ public class Gramatica {
     }
   }
 
-  public void adicionarNovaRegra(String chaveRegraAtual, ArrayList<Regra> novasRegras, Regra arrayInserir) {
+  // public void adicionarNovaRegra(String chaveRegraAtual, ArrayList<Regra>
+  // novasRegras, Regra arrayInserir) {
 
-    if (arrayInserir.regraCompleta.equals(chaveRegraAtual)) {
-      return;
-    }
-    for (var regra : novasRegras) {
-      if (regra.regraCompleta.equals(arrayInserir.regraCompleta))
-        return;
-    }
-    novasRegras.add(arrayInserir);
+  // if (arrayInserir.regraCompleta.equals(chaveRegraAtual)) {
+  // return;
+  // }
 
-  }
+  // for (var regra : novasRegras) {
+  // if (regra.regraCompleta.equals(arrayInserir.regraCompleta))
+  // return;
+  // }
 
-  public ArrayList<Regra> frasesComVazio(ArrayList<Regra> novasRegras, String chaveRegraAtual,
+  // novasRegras.add(arrayInserir);
+
+  // }
+
+  public ArrayList<Regra> frasesNovasGeradasVazio(ArrayList<Regra> novasRegras,
       ArrayList<Integer> lugaresOlha,
-      Regra arrayDaRegra,
-      Map.Entry<String, Regras> regrasOlhar) {
-
-    // var novasRegras = new ArrayList<Regra>();
-    int removidos = 0;
+      Regra arrayDaRegra, ArrayList<Regra> regraOlhando) {
 
     var variacaoRegraAtual = arrayDaRegra.clone();
-    var regraAtual = arrayDaRegra.clone();
 
-    if (lugaresOlha.size() > 0) {
-      for (int i = 0; i < lugaresOlha.size(); i++) {
+    // Devido a Binarização so pode ter regras: (chave que vira vazio = A)
+    // AB -> B
+    // AA -> A | ?
+    // A -> ?
 
-        // A cada incremento permite tirar uma letra a mais
-        int retirar = 1;
-        // Quando for igual a quantVariavel acabou as opções de variaveis a serem
-        // retiradas
-        int variacaoAtual = 0;
-        int contRetiradas = 0;
-
-        for (int m = 0; m <= lugaresOlha.size(); m++) {
-
-          if (m != i) {
-            if (contRetiradas < retirar
-                && m < lugaresOlha.size()) {
-              int alo = lugaresOlha.get(m);
-              variacaoRegraAtual.regraDividida.remove(alo - removidos - contRetiradas);
-              // removidos++;
-              contRetiradas++;
-
-            } else {
-              if (contRetiradas == retirar) {
-                variacaoRegraAtual.atualizarRegraCompleta();
-                adicionarNovaRegra(chaveRegraAtual, novasRegras, variacaoRegraAtual.clone());
-
-                // Resetar a variacaoRegraAtual para a regra atual // tentar a nova variaçao
-                contRetiradas = 0;
-                m -= retirar;
-                variacaoRegraAtual = regraAtual.clone();
-              }
-              variacaoAtual++;
-
-              if (variacaoAtual >= lugaresOlha.size()) {
-                // Olhar todos os lugar para frente da ocorrencia 0 da naoTerminal
-                if (retirar < lugaresOlha.size() - 1) {
-                  m = 0;
-                } else
-                  m = lugaresOlha.size() + 2; // acabou tudo
-                retirar++;
-                variacaoAtual = retirar;
-              }
-
-            }
-          }
-          // var var = new regra();
-          // for (int j = 0; j < variaveis2.size(); j++) {
-          // if (variaveis2.get(i).equals(variaveis2).get(j)) {
-          // var.inserirVariavel();
-          // }
-          // }
+    // if (lugaresOlha.size() > 0) {
+    if (arrayDaRegra.regraDividida.size() == 2) {
+      variacaoRegraAtual.regraDividida.remove(lugaresOlha.get(0).intValue());
+      var pular = false;
+      for (Regra regra : novasRegras) {
+        if (regra.verificarIgual(variacaoRegraAtual)) {
+          pular = true;
         }
-        int v = lugaresOlha.get(i);
-        lugaresOlha.remove(0);
-        regraAtual.regraDividida.remove(v - removidos);
-        // if (!lugaresOlha.isEmpty()) {
-        // var copuVariveis3.regra = new ArrayList<String>();
-        if (!regraAtual.regraDividida.isEmpty()) {
-          regraAtual.atualizarRegraCompleta();
-          adicionarNovaRegra(chaveRegraAtual, novasRegras, regraAtual.clone());
-          variacaoRegraAtual = regraAtual.clone();
-
-        } else {
-          if (!regrasOlhar.getValue().contemArray(vazio)) {
-            regraAtual = new Regra();
-            regraAtual.inserirVariavel(vazio);
-            // regraAtual.atualizarRegraCompleta();
-            novasRegras.add(regraAtual.clone());
-          }
-
-        }
-
-        removidos++;
-        i--;
-        // }
-        // arrayVar.add();
       }
-
+      if (!pular) {
+        variacaoRegraAtual.atualizarRegraCompleta();
+        novasRegras.add(variacaoRegraAtual);
+      }
     }
+    if (lugaresOlha.size() == 2 || arrayDaRegra.regraDividida.size() == 1) {
+      var regraVazio = new Regra();
+      regraVazio.inserirVariavel(vazio);
+      novasRegras.add(regraVazio);
+    }
+
+    // for (int i = 0; i < lugaresOlha.size(); i++) {
+
+    // // A cada incremento permite tirar uma letra a mais
+    // int retirar = 1;
+    // // Quando for igual a quantVariavel acabou as opções de variaveis a serem
+    // // retiradas
+    // int variacaoAtual = 0;
+    // int contRetiradas = 0;
+
+    // for (int m = 0; m <= lugaresOlha.size(); m++) {
+
+    // if (m != i) {
+    // if (contRetiradas < retirar
+    // && m < lugaresOlha.size()) {
+    // int alo = lugaresOlha.get(m);
+    // variacaoRegraAtual.regraDividida.remove(alo - removidos - contRetiradas);
+    // // removidos++;
+    // contRetiradas++;
+
+    // } else {
+    // if (contRetiradas == retirar) {
+    // variacaoRegraAtual.atualizarRegraCompleta();
+    // adicionarNovaRegra(chaveRegraAtual, novasRegras, variacaoRegraAtual.clone());
+
+    // // Resetar a variacaoRegraAtual para a regra atual // tentar a nova variaçao
+    // contRetiradas = 0;
+    // m -= retirar;
+    // variacaoRegraAtual = regraAtual.clone();
+    // }
+    // variacaoAtual++;
+
+    // if (variacaoAtual >= lugaresOlha.size()) {
+    // // Olhar todos os lugar para frente da ocorrencia 0 da naoTerminal
+    // if (retirar < lugaresOlha.size() - 1) {
+    // m = 0;
+    // } else
+    // m = lugaresOlha.size() + 2; // acabou tudo
+    // retirar++;
+    // variacaoAtual = retirar;
+    // }
+
+    // }
+    // }
+    // // var var = new regra();
+    // // for (int j = 0; j < variaveis2.size(); j++) {
+    // // if (variaveis2.get(i).equals(variaveis2).get(j)) {
+    // // var.inserirVariavel();
+    // // }
+    // // }
+    // }
+    // int v = lugaresOlha.get(i);
+    // lugaresOlha.remove(0);
+    // regraAtual.regraDividida.remove(v - removidos);
+    // // if (!lugaresOlha.isEmpty()) {
+    // // var copuVariveis3.regra = new ArrayList<String>();
+    // if (!regraAtual.regraDividida.isEmpty()) {
+    // regraAtual.atualizarRegraCompleta();
+    // adicionarNovaRegra(chaveRegraAtual, novasRegras, regraAtual.clone());
+    // variacaoRegraAtual = regraAtual.clone();
+
+    // } else {
+    // if (!regrasOlhar.getValue().contemArray(vazio)) {
+    // regraAtual = new Regra();
+    // regraAtual.inserirVariavel(vazio);
+    // // regraAtual.atualizarRegraCompleta();
+    // novasRegras.add(regraAtual.clone());
+    // }
+
+    // }
+
+    // removidos++;
+    // i--;
+    // }
+    // arrayVar.add();
+    // }
+
+    // }
 
     return novasRegras;
   }
 
   public void tirarVazio() throws CloneNotSupportedException {
-    var temVazio = new ArrayList<String>();
-    var tirouVazio = new ArrayList<String>();
-    var naoTemVazio = new ArrayList<String>();
+    var temVazio = new ArrayList<String>(); // Não terminais que tem vazio atualmente
+    var naoTemVazio = new ArrayList<String>(); // Não terminais que tem vazio atualmente
+    var tirouVazio = new ArrayList<String>(); // Não terminais já perderam o vazio e não podem ter mais vazio
+
     novaPrimeiraRegra();
 
     for (var mapRegras : gramatica.entrySet()) {
@@ -643,14 +726,14 @@ public class Gramatica {
         tirouVazio.add(chaveVazio);
         // for (String chaveVazio : temVazio) {
 
-        for (var regrasOlhar : gramatica.entrySet()) {
+        for (var mapRegrasOlhar : gramatica.entrySet()) {
           var novasRegras = new ArrayList<Regra>();
-          var regraOlhando = regrasOlhar.getValue().listaRegras;
+          var regrasOlhando = mapRegrasOlhar.getValue().listaRegras;
 
-          for (Regra arrayDaRegra : regraOlhando) {
+          for (Regra regraOlhar : regrasOlhando) {
             ArrayList<Integer> lugaresOlha = new ArrayList<Integer>();
 
-            var variaveis2 = arrayDaRegra.regraDividida;
+            var variaveis2 = regraOlhar.regraDividida;
 
             // Verificar todos os lugares com a naoTerminal vazia ?
             for (int i = 0; i < variaveis2.size(); i++) {
@@ -659,30 +742,44 @@ public class Gramatica {
               }
             }
             if (lugaresOlha.size() > 0) {
-              frasesComVazio(novasRegras, regrasOlhar.getKey(), lugaresOlha, arrayDaRegra, regrasOlhar);
+              frasesNovasGeradasVazio(novasRegras, lugaresOlha, regraOlhar, regrasOlhando);
               if (novasRegras.size() > 0) {
+                // Se a ultima regra for vazio
                 if (novasRegras.get(novasRegras.size() - 1).regraCompleta.equals(vazio)) {
 
-                  if (!temVazio.contains(regrasOlhar.getKey())) {
-                    naoTemVazio.remove(regrasOlhar.getKey());
-                    // remover.add(regrasOlhar.getKey());
-                    temVazio.add(regrasOlhar.getKey());
+                  if (!temVazio.contains(mapRegrasOlhar.getKey())) {
+                    naoTemVazio.remove(mapRegrasOlhar.getKey());
+                    temVazio.add(temVazio.size(), mapRegrasOlhar.getKey());
                   }
-                  if (tirouVazio.contains(regrasOlhar.getKey())) {
+                  // Tudo que ja tirou o vazio não pode voltar a ter vazio
+                  if (tirouVazio.contains(mapRegrasOlhar.getKey())) {
                     novasRegras.remove(novasRegras.size() - 1);
                   }
                 }
 
               }
+
             }
           }
-          regraOlhando.addAll(novasRegras);
-
+          // So Adiciona regras diferentes
+          for (var novaRegra : novasRegras) {
+            var colocar = true;
+            for (var regra : regrasOlhando) {
+              if (regra.verificarIgual(novaRegra)) {
+                colocar = false;
+                break;
+              }
+            }
+            if (colocar) {
+              regrasOlhando.add(novaRegra);
+            }
+          }
         }
+
         if (!naoTemVazio.contains(chaveVazio)) {
           naoTemVazio.add(chaveVazio);
 
-          // Primeira regra pode ter o ?
+          // Primeira regra pode ter o vazio
           if (!chaveVazio.equals(primeiraRegra))
             gramatica.get(chaveVazio).removerRegra(vazio);
 
@@ -690,10 +787,9 @@ public class Gramatica {
           if (gramatica.get(chaveVazio).listaRegras.isEmpty())
             removerGramatica(chaveVazio);
         }
+
       }
     }
-    // System.out.println("--------------");
-
   }
 
   public void imprimirRegras() {
@@ -702,33 +798,46 @@ public class Gramatica {
 
     irAinda.add(primeiraRegra);
     int i = 0;
+
     while (i < gramatica.size()) {
+
       System.out.print("" + irAinda.get(i) + " -> ");
       var regras = gramatica.get(irAinda.get(i++));
+
       for (var regra : regras.listaRegras) {
-        for (String segmento : regra.regraDividida) {
-          System.out.print(segmento);
-          if (!irAinda.contains(segmento) && gramatica.containsKey(segmento)) {
-            irAinda.add(segmento);
+
+        for (String letra : regra.regraDividida) {
+          System.out.print(letra);
+
+          if (!irAinda.contains(letra) && gramatica.containsKey(letra)) {
+            irAinda.add(letra);
           }
         }
+
         if (!regra.equals(regras.listaRegras.get(regras.listaRegras.size() - 1))) {
           System.out.print(" | ");
         }
+
       }
+
       System.out.println();
+
     }
+
   }
 
   public boolean fazerCykNormal(String testarCadeia) {
 
+    // Se a cadeia a ser testada for vazio, a primeira regra deve ter vazio
     if (testarCadeia.isEmpty() || testarCadeia.equals(vazio)) {
       return gramatica.get(primeiraRegra).contem(vazio);
     }
 
     var regraCadeiTeste = new Regras();
-    var testarCadeiaArray = regraCadeiTeste.inserirArrayRegra(testarCadeia);
+    var testarCadeiaArray = regraCadeiTeste.inserirListaRegra(testarCadeia);
+    // Divide a cadeia a ser testada em uma nova regra
 
+    // Se a cadeia a ser testada tem terminais desconhecidos parar
     for (String variavel : testarCadeiaArray.regraDividida) {
       if (!terminais.contains(variavel) && !gramatica.keySet().contains(variavel)) {
         return false;
@@ -749,16 +858,13 @@ public class Gramatica {
       }
     }
 
+    // Armazenar todas as chaves que geram a combinação
     HashMap<String, Regras> regrasRepetidas = new HashMap<>();
 
     for (int j = 2; j <= testarCadeiaArray.regraDividida.size(); j++) {
       for (int i = j - 1; i >= 1; i--) {
         for (int h = i; h <= j - 1; h++) {
-          if (!(matrizProducao[i - 1][h - 1] == null || matrizProducao[h][j - 1] == null)
-          /*
-           * && !(matrizProducao[i - 1][h - 1].listaRegras == null || matrizProducao[h][j
-           * - 1].listaRegras == null)
-           */) {
+          if (!(matrizProducao[i - 1][h - 1] == null || matrizProducao[h][j - 1] == null)) {
             for (var var1 : matrizProducao[i - 1][h - 1].listaRegras) {
               for (var var2 : matrizProducao[h][j - 1].listaRegras) {
 
@@ -766,27 +872,23 @@ public class Gramatica {
 
                 if (!regrasRepetidas.containsKey(producao)) {
                   regrasRepetidas.put(producao, new Regras());
-
                   for (var hashGramatica : gramatica.entrySet()) {
                     if (hashGramatica.getValue().contem(producao)) {
 
-                      inserirRegra(matrizProducao, i - 1, j - 1, hashGramatica.getKey());
-
+                      inserirRegraMatriz(matrizProducao, i - 1, j - 1, hashGramatica.getKey());
                       var novaRegra = new Regra();
                       novaRegra.inserirVariavel(hashGramatica.getKey());
+                      // Armazenar todas as chaves que geram a combinação atual
                       regrasRepetidas.get(producao).listaRegras.add(novaRegra);
-                      // regrasRepetidas.get(producao).add(producao, hashGramatica.getKey());
-
                     }
                   }
 
                 } else if (!regrasRepetidas.get(producao).listaRegras.isEmpty()) {
                   for (var regra : regrasRepetidas.get(producao).listaRegras) {
-                    inserirRegra(matrizProducao, i - 1, j - 1, regra.regraCompleta);
+                    inserirRegraMatriz(matrizProducao, i - 1, j - 1, regra.regraCompleta);
                   }
-                  // matrizProducao[i - 1][j - 1]
-                  // .inserirVariaveis(regrasRepetidas.get(producao));
                 }
+
               }
             }
           }
@@ -794,32 +896,11 @@ public class Gramatica {
       }
     }
 
-    // for (int i = 0; i < matrizProducao.length; i++) {
-    // for (int j = 0; j < matrizProducao.length; j++) {
-    // // System.out.print("i:" + i);
-    // if (matrizProducao[i][j] != null) {
-    // // System.out.print("i:" + i + "j:" + j + " ");
-    // matrizProducao[i][j].imprimirRegras();
-    // } else {
-    // System.out.print("???");
-    // }
-    // System.out.print(" ");
-    // }
-    // System.out.println();
-    // }
-
-    // }
-    // if (matrizProducao[testarCadeiaArray.regra.size() - 1][0] != null
-    // && matrizProducao[testarCadeiaArray.regra.size() -
-    // 1][0].contem(primeiraRegra)) {
-    // return true;
-    // }
-
     return matrizProducao[0][testarCadeiaArray.regraDividida.size() - 1] != null
         && matrizProducao[0][testarCadeiaArray.regraDividida.size() - 1].contem(primeiraRegra);
   }
 
-  public void inserirRegra(Regras[][] matrizInserir, int i, int j, String inserir) {
+  public void inserirRegraMatriz(Regras[][] matrizInserir, int i, int j, String inserir) {
     if (matrizInserir[i][j] == null) {
       matrizInserir[i][j] = new Regras();
       matrizInserir[i][j].inserirVariaveis(inserir);
@@ -828,15 +909,53 @@ public class Gramatica {
     }
   }
 
+  public HashMap<String, Regras> relacoesUnitarias(ArrayList<String> listaNulos) {
+    HashMap<String, Regras> relacoesUnitarias = new HashMap<>();
+
+    for (var mapRegras : gramatica.entrySet()) {
+      for (var regra : mapRegras.getValue().listaRegras) {
+        var regraTeste = regra.regraDividida;
+
+        if (regraTeste.size() == 1 && !regraTeste.get(0).equals(vazio)) {
+          if (!relacoesUnitarias.containsKey(mapRegras.getKey())) {
+            relacoesUnitarias.put(mapRegras.getKey(), new Regras());
+          }
+
+          relacoesUnitarias.get(mapRegras.getKey()).listaRegras.add(new Regra(regraTeste.get(0)));
+        } else {
+          for (int i = 0; i < regraTeste.size(); i++) {
+            if (listaNulos.contains(regraTeste.get(i))) {
+
+              regraTeste.remove(i);
+
+              if (!relacoesUnitarias.containsKey(mapRegras.getKey())) {
+                relacoesUnitarias.put(mapRegras.getKey(), new Regras());
+              }
+
+              relacoesUnitarias.get(mapRegras.getKey()).listaRegras.add(new Regra(regraTeste.get(0)));
+              regraTeste = regra.regraDividida;
+            }
+          }
+        }
+      }
+
+    }
+
+    return relacoesUnitarias;
+  }
+
   public boolean fazerCykModificado(String testarCadeia) {
 
+    // Se a cadeia a ser testada for vazio, a primeira regra deve ter vazio
     if (testarCadeia.isEmpty() || testarCadeia.equals(vazio)) {
       return gramatica.get(primeiraRegra).contem(vazio);
     }
 
     var regraCadeiTeste = new Regras();
-    var testarCadeiaArray = regraCadeiTeste.inserirArrayRegra(testarCadeia);
+    var testarCadeiaArray = regraCadeiTeste.inserirListaRegra(testarCadeia);
+    // Divide a cadeia a ser testada em uma nova regra
 
+    // Se a cadeia a ser testada tem terminais desconhecidos parar
     for (String variavel : testarCadeiaArray.regraDividida) {
       if (!terminais.contains(variavel) && !gramatica.keySet().contains(variavel)) {
         return false;
@@ -849,51 +968,76 @@ public class Gramatica {
     for (int i = 0; i < testarCadeiaArray.regraDividida.size(); i++) {
       for (var hashGramatica : gramatica.entrySet()) {
         if (hashGramatica.getValue().contemArray(testarCadeiaArray.regraDividida.get(i))) {
-          if (matrizProducao[0][i] == null) {
-            matrizProducao[0][i] = new Regras();
-
+          if (matrizProducao[i][i] == null) {
+            matrizProducao[i][i] = new Regras();
           }
-          matrizProducao[0][i].inserirVariaveis(hashGramatica.getKey());
+          matrizProducao[i][i].inserirVariaveis(hashGramatica.getKey());
         }
       }
     }
 
-    for (int i = 2; i <= testarCadeiaArray.regraDividida.size(); i++) {
-      for (int j = 1; j <= testarCadeiaArray.regraDividida.size() - i + 1; j++) {
-        for (int k = 1, m = i - 2, n = j; k < i; k++, m--, n++) {
-          if (!(matrizProducao[k - 1][j - 1] == null || matrizProducao[m][n] == null)) {
-            for (var var1 : matrizProducao[k - 1][j - 1].listaRegras) {
-              for (var var2 : matrizProducao[m][n].listaRegras) {
+    Regras[][] matrizProducaoLinha = new Regras[testarCadeiaArray.regraDividida.size()][testarCadeiaArray.regraDividida
+        .size()];
+
+    for (int i = 0; i < testarCadeiaArray.regraDividida.size(); i++) {
+      var letra = testarCadeiaArray.regraDividida.get(i);
+      if (gramaticaReversa.containsKey(letra))
+        // for (var hashGramatica : gramaticaReversa.entrySet()) {
+        matrizProducaoLinha[i][i] = gramaticaReversa.get(letra);
+
+      // }
+    }
+
+    // Armazenar todas as chaves que geram a combinação
+    HashMap<String, Regras> regrasRepetidas = new HashMap<>();
+
+    for (int j = 2; j <= testarCadeiaArray.regraDividida.size(); j++) {
+      for (int i = j - 1; i >= 1; i--) {
+        for (int h = i; h <= j - 1; h++) {
+          if (!(matrizProducaoLinha[i - 1][h - 1] == null || matrizProducaoLinha[h][j - 1] == null)) {
+            for (var var1 : matrizProducaoLinha[i - 1][h - 1].listaRegras) {
+              for (var var2 : matrizProducaoLinha[h][j - 1].listaRegras) {
 
                 String producao = "" + var1.regraCompleta + var2.regraCompleta;
 
-                for (var hashGramatica : gramatica.entrySet()) {
-                  if (hashGramatica.getValue().contem(producao)) {
-                    if (matrizProducao[i - 1][j - 1] == null) {
-                      matrizProducao[i - 1][j - 1] = new Regras();
-                    }
-                    if (!matrizProducao[i - 1][j - 1].contem(hashGramatica.getKey())) {
-                      matrizProducao[i - 1][j - 1]
-                          .inserirVariaveis(hashGramatica.getKey());
+                if (!regrasRepetidas.containsKey(producao)) {
+                  regrasRepetidas.put(producao, new Regras());
+                  for (var hashGramatica : gramatica.entrySet()) {
+                    if (hashGramatica.getValue().contem(producao)) {
+
+                      inserirRegraMatriz(matrizProducaoLinha, i - 1, j - 1, hashGramatica.getKey());
+
+                      var novaRegra = new Regra();
+                      novaRegra.inserirVariavel(hashGramatica.getKey());
+                      // Armazenar todas as chaves que geram a combinação atual
+                      regrasRepetidas.get(producao).listaRegras.add(novaRegra);
                     }
                   }
+
+                } else if (!regrasRepetidas.get(producao).listaRegras.isEmpty()) {
+                  for (var regra : regrasRepetidas.get(producao).listaRegras) {
+                    inserirRegraMatriz(matrizProducaoLinha, i - 1, j - 1, regra.regraCompleta);
+                  }
                 }
+
               }
             }
           }
         }
+        if (!(matrizProducaoLinha[i - 1][j - 1] == null)) {
+          if (matrizProducao[i - 1][j - 1] == null) {
+            matrizProducao[i - 1][j - 1] = new Regras();
+          }
+          for (var regra : matrizProducaoLinha[i - 1][j - 1].listaRegras) {
+            matrizProducao[i - 1][j - 1].listaRegras.addAll(gramaticaReversa.get(regra.regraCompleta).listaRegras);
+          }
+        }
+
       }
     }
 
-    // }
-    // if (matrizProducao[testarCadeiaArray.regra.size() - 1][0] != null
-    // && matrizProducao[testarCadeiaArray.regra.size() -
-    // 1][0].contem(primeiraRegra)) {
-    // return true;
-    // }
-
-    return matrizProducao[testarCadeiaArray.regraDividida.size() - 1][0] != null
-        && matrizProducao[testarCadeiaArray.regraDividida.size() - 1][0].contem(primeiraRegra);
+    return matrizProducao[0][testarCadeiaArray.regraDividida.size() - 1] != null
+        && matrizProducao[0][testarCadeiaArray.regraDividida.size() - 1].contem(primeiraRegra);
   }
 
   // Nullable(G) =
@@ -922,9 +1066,9 @@ public class Gramatica {
   // 18 todo := todo ∪ {A}
   // 19 return nullable
 
-  public void nunable() {
+  public ArrayList<String> nullAble() {
     var regrasNulas = new Gramatica(primeiraRegra);
-    var nullable = new ArrayList<String>();
+    var nullAble = new ArrayList<String>();
     var todo = new ArrayList<String>();
 
     for (var regra : gramatica.entrySet()) {
@@ -941,15 +1085,26 @@ public class Gramatica {
           regrasNulas.inserirRegra(regra.regraDividida.get(0), regra.regraDividida.get(1));
           regrasNulas.inserirRegra(regra.regraDividida.get(1), mapRegras.getKey());
           regrasNulas.inserirRegra(regra.regraDividida.get(1), regra.regraDividida.get(0));
-        } else if (regra.regraCompleta.equals("?")) {
-          nullable.add(mapRegras.getKey());
+        } else if (regra.regraCompleta.equals(vazio)) {
+          nullAble.add(mapRegras.getKey());
           todo.add(mapRegras.getKey());
         }
       }
     }
 
     while (!todo.isEmpty()) {
-      int i = 0;
+      var chaveVerificar = todo.remove(0);
+      var regras = gramaticaReversa.get(chaveVerificar);
+      if (regras != null)
+        for (var regra : regras.listaRegras) {
+          if (nullAble.contains(regra.regraCompleta)) {
+            if (!nullAble.contains(chaveVerificar)) {
+              nullAble.add(chaveVerificar);
+              todo.add(chaveVerificar);
+            }
+          }
+        }
+
       // for (var regra : mapRegras.getValue().regras) {
       // if (regra.regra.get(0) == "?") {
       // regrasNulas.inserirRegra(regra.regraCompleta, mapRegras.getKey());
@@ -965,6 +1120,7 @@ public class Gramatica {
     }
 
     System.out.println("alo");
+    return nullAble;
   }
 
   // for (Map.Entry<String, Regras> regra : gramatica.entrySet()) {
