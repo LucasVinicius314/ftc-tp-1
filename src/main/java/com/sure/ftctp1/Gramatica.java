@@ -1,9 +1,11 @@
 package com.sure.ftctp1;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Gramatica {
   String primeiraRegra = "";
@@ -99,7 +101,7 @@ public class Gramatica {
     inserirRegra(naoTerminal, palavra);
   }
 
-  public void formaNormalChomsky() throws CloneNotSupportedException {
+  public void formaNormalChomsky() {
     removerInuteis();
     System.out.println("Tirou inutil");
     imprimirRegras();
@@ -138,12 +140,6 @@ public class Gramatica {
     imprimirRegras();
     System.out.println("--------------");
     gramaticaReversa();
-
-    var nulos = nullAble();
-
-    var relacoesUnitarias = relacoesUnitarias(nulos);
-
-    conjuntosUnitarios(relacoesUnitarias);
   }
 
   public HashMap<String, ArrayList<String>> conjuntosUnitarios(HashMap<String, ArrayList<String>> relacoesUnitarias) {
@@ -797,7 +793,7 @@ public class Gramatica {
     return novasRegras;
   }
 
-  public void tirarVazio() throws CloneNotSupportedException {
+  public void tirarVazio() {
     var temVazio = new ArrayList<String>(); // Não terminais que tem vazio atualmente
     var naoTemVazio = new ArrayList<String>(); // Não terminais que tem vazio atualmente
     var tirouVazio = new ArrayList<String>(); // Não terminais já perderam o vazio e não podem ter mais vazio
@@ -1037,100 +1033,92 @@ public class Gramatica {
     return relacoesUnitarias;
   }
 
-  public boolean fazerCykModificado(String testarCadeia) {
+  // TODO: terminar
+  public boolean fazerCykModificado(String frase) {
 
     // Se a cadeia a ser testada for vazio, a primeira regra deve ter vazio
-    if (testarCadeia.isEmpty() || testarCadeia.equals(vazio)) {
+    if (frase.isEmpty() || frase.equals(vazio)) {
       return gramatica.get(primeiraRegra).contem(vazio);
     }
 
-    var regraCadeiTeste = new Regras();
-    var testarCadeiaArray = regraCadeiTeste.inserirListaRegra(testarCadeia);
-    // Divide a cadeia a ser testada em uma nova regra
+    final var tamanho = frase.length();
 
-    // Se a cadeia a ser testada tem terminais desconhecidos parar
-    for (String variavel : testarCadeiaArray.regraDividida) {
-      if (!terminais.contains(variavel) && !gramatica.keySet().contains(variavel)) {
-        return false;
+    final var tabela = new TabelaCykModificado(tamanho);
+
+    final var mapConjuntoUnitario = conjuntosUnitarios(relacoesUnitarias(nullable()));
+
+    for (var index = 0; index < tamanho; index++) {
+
+      final var item = frase.substring(index, index + 1);
+
+      tabela.linhas.get(index).get(index).principal = item;
+
+      if (mapConjuntoUnitario.containsKey(item)) {
+
+        tabela.linhas.get(index).get(index).secundarios = mapConjuntoUnitario.get(item);
       }
     }
 
-    Regras[][] matrizProducao = new Regras[testarCadeiaArray.regraDividida.size()][testarCadeiaArray.regraDividida
-        .size()];
+    for (final var coordenada : fazerListaDeCoordenadas(tamanho - 1)) {
 
-    for (int i = 0; i < testarCadeiaArray.regraDividida.size(); i++) {
-      for (var hashGramatica : gramatica.entrySet()) {
-        if (hashGramatica.getValue().contemArray(testarCadeiaArray.regraDividida.get(i))) {
-          if (matrizProducao[i][i] == null) {
-            matrizProducao[i][i] = new Regras();
-          }
-          matrizProducao[i][i].inserirVariaveis(hashGramatica.getKey());
+      // TODO: terminar
+
+      final var letraDaEsquerda = tabela.linhas.get(coordenada.y).get(coordenada.y);
+      final var letraDeBaixo = tabela.linhas.get(coordenada.x).get(coordenada.x);
+
+      final var temEsquerda = new ArrayList<>();
+      final var temBaixo = new ArrayList<>();
+
+      for (final var regra : gramatica.entrySet()) {
+
+        if (!regra.getValue().listaRegras.stream().filter(v -> v.regraDividida.contains(letraDaEsquerda.principal))
+            .collect(Collectors.toList()).isEmpty()) {
+
+          temEsquerda.add(regra.getKey());
         }
+
+        if (!regra.getValue().listaRegras.stream().filter(v -> v.regraDividida.contains(letraDeBaixo.principal))
+            .collect(Collectors.toList()).isEmpty()) {
+
+          temBaixo.add(regra.getKey());
+        }
+      }
+
+      // TODO: buscar lista de todos os valores possíveis de cada variável da regra
+      // encontrar ele nos 2 arrays
+
+      "".toString();
+    }
+
+    System.out.println(tabela);
+
+    return false;
+  }
+
+  /**
+   * Construir a lista de coordenadas para o CYK modificado, com o seguinte
+   * padrão:
+   * (7, 6) (6, 5) ... (1, 0)
+   * (7, 5) (6, 4) ... (2, 0)
+   * 
+   * @param indiceMaximo
+   * @return
+   */
+  List<Coordenada> fazerListaDeCoordenadas(int indiceMaximo) {
+
+    final var fila = new ArrayList<Coordenada>();
+
+    for (int y = indiceMaximo - 1; y >= 0; y--) {
+
+      var novoY = y;
+
+      for (int count = 0; novoY >= 0; count++, novoY--) {
+
+        fila.add(new Coordenada(indiceMaximo - count, novoY));
       }
     }
 
-    Regras[][] matrizProducaoLinha = new Regras[testarCadeiaArray.regraDividida.size()][testarCadeiaArray.regraDividida
-        .size()];
-
-    for (int i = 0; i < testarCadeiaArray.regraDividida.size(); i++) {
-      var letra = testarCadeiaArray.regraDividida.get(i);
-      if (gramaticaReversa.containsKey(letra))
-        // for (var hashGramatica : gramaticaReversa.entrySet()) {
-        matrizProducaoLinha[i][i] = gramaticaReversa.get(letra);
-
-      // }
-    }
-
-    // Armazenar todas as chaves que geram a combinação
-    HashMap<String, Regras> regrasRepetidas = new HashMap<>();
-
-    for (int j = 2; j <= testarCadeiaArray.regraDividida.size(); j++) {
-      for (int i = j - 1; i >= 1; i--) {
-        for (int h = i; h <= j - 1; h++) {
-          if (!(matrizProducaoLinha[i - 1][h - 1] == null || matrizProducaoLinha[h][j - 1] == null)) {
-            for (var var1 : matrizProducaoLinha[i - 1][h - 1].listaRegras) {
-              for (var var2 : matrizProducaoLinha[h][j - 1].listaRegras) {
-
-                String producao = "" + var1.regraCompleta + var2.regraCompleta;
-
-                if (!regrasRepetidas.containsKey(producao)) {
-                  regrasRepetidas.put(producao, new Regras());
-                  for (var hashGramatica : gramatica.entrySet()) {
-                    if (hashGramatica.getValue().contem(producao)) {
-
-                      inserirRegraMatriz(matrizProducaoLinha, i - 1, j - 1, hashGramatica.getKey());
-
-                      var novaRegra = new Regra();
-                      novaRegra.inserirVariavel(hashGramatica.getKey());
-                      // Armazenar todas as chaves que geram a combinação atual
-                      regrasRepetidas.get(producao).listaRegras.add(novaRegra);
-                    }
-                  }
-
-                } else if (!regrasRepetidas.get(producao).listaRegras.isEmpty()) {
-                  for (var regra : regrasRepetidas.get(producao).listaRegras) {
-                    inserirRegraMatriz(matrizProducaoLinha, i - 1, j - 1, regra.regraCompleta);
-                  }
-                }
-
-              }
-            }
-          }
-        }
-        if (!(matrizProducaoLinha[i - 1][j - 1] == null)) {
-          if (matrizProducao[i - 1][j - 1] == null) {
-            matrizProducao[i - 1][j - 1] = new Regras();
-          }
-          for (var regra : matrizProducaoLinha[i - 1][j - 1].listaRegras) {
-            matrizProducao[i - 1][j - 1].listaRegras.addAll(gramaticaReversa.get(regra.regraCompleta).listaRegras);
-          }
-        }
-
-      }
-    }
-
-    return matrizProducao[0][testarCadeiaArray.regraDividida.size() - 1] != null
-        && matrizProducao[0][testarCadeiaArray.regraDividida.size() - 1].contem(primeiraRegra);
+    return fila;
   }
 
   // Nullable(G) =
@@ -1159,7 +1147,7 @@ public class Gramatica {
   // 18 todo := todo ∪ {A}
   // 19 return nullable
 
-  public ArrayList<String> nullAble() {
+  public ArrayList<String> nullable() {
     var regrasNulas = new Gramatica(primeiraRegra);
     var nullAble = new ArrayList<String>();
     var todo = new ArrayList<String>();
@@ -1212,7 +1200,6 @@ public class Gramatica {
       // }
     }
 
-    System.out.println("alo");
     return nullAble;
   }
 
@@ -1224,4 +1211,79 @@ public class Gramatica {
   // }
 
   // }
+}
+
+// TODO: mover
+class TabelaCykModificado {
+
+  public TabelaCykModificado(int tamanho) {
+
+    linhas = Collections.nCopies(tamanho, null)
+        .stream()
+        .map(v -> Collections.nCopies(tamanho, null)
+            .stream()
+            .map(v2 -> new ItemCykModificado())
+            .collect(Collectors.toList()))
+        .collect(Collectors.toList());
+  }
+
+  List<List<ItemCykModificado>> linhas = new ArrayList<>();
+
+  @Override
+  public String toString() {
+
+    final var buffer0 = new StringBuilder();
+
+    var maxSize = 0;
+
+    for (final var linha : linhas) {
+
+      for (final var coluna : linha) {
+
+        if (coluna.secundarios.size() > maxSize) {
+
+          maxSize = coluna.secundarios.size();
+        }
+      }
+    }
+
+    for (final var linha : linhas) {
+
+      final var buffer1 = new StringBuilder();
+
+      for (final var coluna : linha) {
+
+        buffer1.append(String.format("[%s] ", coluna.toStringWithPad(maxSize * 3 - 2)));
+      }
+
+      buffer0.append(String.format("%s%n", buffer1));
+    }
+
+    return buffer0.toString();
+  }
+}
+
+class ItemCykModificado {
+
+  String principal = "";
+  List<String> secundarios = new ArrayList<>();
+
+  public String toStringWithPad(int length) {
+
+    final var tmp = Utils.padEnd(secundarios.stream().collect(Collectors.joining(", ")), length, ' ');
+
+    return String.format("%s -> %s", principal.equals("") ? " " : principal, tmp);
+  }
+}
+
+class Coordenada {
+
+  public Coordenada(int x, int y) {
+
+    this.x = x;
+    this.y = y;
+  }
+
+  public int x;
+  public int y;
 }

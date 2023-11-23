@@ -33,8 +33,7 @@ public class Main {
     // Para ler os testes do CYK na gramatica, é so utilizar a função:
     // readTesteGramatica(nomeDoArquivo,gramatica)
 
-    var gramatica = readGramatica(
-        "E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\gramatica.txt");
+    var gramatica = readGramatica("gramatica-2.txt");
 
     // Gramatica gramatica = new Gramatica("L", "aSaSaS");
     // gramatica.inserirMuitasRegras("S", "b ?");
@@ -98,12 +97,14 @@ public class Main {
     // gramatica.inserirMuitasRegras("N", "Na Nb ? bN aN");
     // gramatica.inserirMuitasRegras("A", "aAb a aA baN");
 
-    // gramatica.formaNormalChomsky();
-    gramatica.forma2NF();
+    // Teste da gramática.
+
+    // eDaGramaticaNormal(gramatica, "abaab");
+    eDaGramaticaModificado(gramatica, "(ac+b)*a");
+
     // gramatica.imprimirRegras();
 
-    // readTesteGramatica("E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\testarFrase.txt",
-    // gramatica);
+    // readTesteGramatica("testarFrase.txt", gramatica);
 
     // eDaGramatica(gramatica, "abaab");
     // eDaGramatica(gramatica, "bababab");
@@ -115,7 +116,9 @@ public class Main {
 
   }
 
-  public static void eDaGramatica(Gramatica gramatica, String frase) {
+  public static void eDaGramaticaNormal(Gramatica gramatica, String frase) throws CloneNotSupportedException {
+    gramatica.formaNormalChomsky();
+
     if (gramatica.fazerCykNormal(frase)) {
       System.out.println("A frase ( " + frase + " ) é da linguagem");
     } else {
@@ -123,7 +126,9 @@ public class Main {
     }
   }
 
-  public static void eDaGramatica(Gramatica gramatica, String frase, int i) {
+  public static void eDaGramaticaModificado(Gramatica gramatica, String frase) {
+    gramatica.forma2NF();
+
     if (gramatica.fazerCykModificado(frase)) {
       System.out.println("A frase ( " + frase + " ) é da linguagem");
     } else {
@@ -167,7 +172,7 @@ public class Main {
     String line;
 
     while ((line = br.readLine()) != null) {
-      eDaGramatica(gramatica, line);
+      eDaGramaticaNormal(gramatica, line);
     }
     br.close();
   }

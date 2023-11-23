@@ -1,0 +1,7 @@
+E -> T | EX
+T -> F | TY
+F -> aI | bI | (Z
+I -> cI | dI | ?
+X -> +T
+Y -> *F
+Z -> E)
