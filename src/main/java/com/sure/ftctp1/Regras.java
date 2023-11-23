@@ -61,19 +61,19 @@ public class Regras {
     return a;
   }
 
-  public Regra inserirArrayString(ArrayList<String> inserir) {
-    var a = new Regra();
-    for (String string : inserir) {
-      a.inserirVariavel(string);
-    }
-    return a;
-  }
+  // public Regra inserirArrayString(ArrayList<String> inserir) {
+  // var a = new Regra();
+  // for (String string : inserir) {
+  // a.inserirVariavel(string);
+  // }
+  // return a;
+  // }
 
-  public Regra inserirVariaveis(ArrayList<String> inserir) {
-    var a = inserirArrayString(inserir);
-    listaRegras.add(a);
-    return a;
-  }
+  // public Regra inserirVariaveis(ArrayList<String> inserir) {
+  // var a = inserirArrayString(inserir);
+  // listaRegras.add(a);
+  // return a;
+  // }
 
   public Regra inserirVariaveis(String regra) {
 

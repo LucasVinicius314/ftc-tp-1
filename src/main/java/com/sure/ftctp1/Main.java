@@ -39,6 +39,10 @@ public class Main {
     // Gramatica gramatica = new Gramatica("L", "aSaSaS");
     // gramatica.inserirMuitasRegras("S", "b ?");
 
+    // Gramatica gramatica = new Gramatica("L", "S");
+    // gramatica.inserirMuitasRegras("S", "A");
+    // gramatica.inserirMuitasRegras("A", "b Ab");
+
     // Gramatica gramatica = new Gramatica("S", "aK D");
     // gramatica.inserirMuitasRegras("K", "AB BA");
     // gramatica.inserirMuitasRegras("A", "Aa ?");
@@ -101,7 +105,7 @@ public class Main {
     // readTesteGramatica("E:\\AAAAULAS\\PUC\\6Sexto\\FTC\\ftc-tp-1\\src\\main\\java\\com\\sure\\ftctp1\\testarFrase.txt",
     // gramatica);
 
-    eDaGramatica(gramatica, "aaab");
+    // eDaGramatica(gramatica, "abaab");
     // eDaGramatica(gramatica, "bababab");
     // eDaGramatica(gramatica, "bbbaaa");
 
@@ -111,15 +115,15 @@ public class Main {
 
   }
 
-  // public static void eDaGramatica(Gramatica gramatica, String frase) {
-  // if (gramatica.fazerCykNormal(frase)) {
-  // System.out.println("A frase ( " + frase + " ) é da linguagem");
-  // } else {
-  // System.out.println("A frase ( " + frase + " ) não é da linguagem");
-  // }
-  // }
-
   public static void eDaGramatica(Gramatica gramatica, String frase) {
+    if (gramatica.fazerCykNormal(frase)) {
+      System.out.println("A frase ( " + frase + " ) é da linguagem");
+    } else {
+      System.out.println("A frase ( " + frase + " ) não é da linguagem");
+    }
+  }
+
+  public static void eDaGramatica(Gramatica gramatica, String frase, int i) {
     if (gramatica.fazerCykModificado(frase)) {
       System.out.println("A frase ( " + frase + " ) é da linguagem");
     } else {

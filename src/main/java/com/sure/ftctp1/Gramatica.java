@@ -123,8 +123,8 @@ public class Gramatica {
     System.out.println("Tirou regras de não terminal solo");
     removerRegraUnidade();
     removerInuteis();
-    System.out.println("--------------");
     imprimirRegras();
+    System.out.println("--------------");
   }
 
   public void forma2NF() {
@@ -141,7 +141,54 @@ public class Gramatica {
 
     var nulos = nullAble();
 
-    relacoesUnitarias(nulos);
+    var relacoesUnitarias = relacoesUnitarias(nulos);
+
+    conjuntosUnitarios(relacoesUnitarias);
+  }
+
+  public HashMap<String, ArrayList<String>> conjuntosUnitarios(HashMap<String, ArrayList<String>> relacoesUnitarias) {
+    HashMap<String, ArrayList<String>> conjuntosUnitarios = new HashMap<>();
+
+    for (var mapRelacoes : relacoesUnitarias.entrySet()) {
+      for (var regra : mapRelacoes.getValue()) {
+        if (!conjuntosUnitarios.containsKey(regra)) {
+          conjuntosUnitarios.put(regra, new ArrayList<>());
+        }
+        if (!conjuntosUnitarios.get(regra).contains(mapRelacoes.getKey())) {
+          conjuntosUnitarios.get(regra).add(mapRelacoes.getKey());
+        }
+      }
+    }
+
+    for (var mapConjunto : conjuntosUnitarios.entrySet()) {
+      for (int i = 0; i < mapConjunto.getValue().size(); i++) {
+        var regra = mapConjunto.getValue().get(i);
+        if (conjuntosUnitarios.containsKey(regra)) {
+          for (var regraInserir : conjuntosUnitarios.get(regra)) {
+            if (!mapConjunto.getValue().contains(regraInserir)) {
+              mapConjunto.getValue().add(mapConjunto.getValue().size() - 1, regraInserir);
+            }
+          }
+        }
+
+      }
+    }
+
+    for (var mapConjunto : conjuntosUnitarios.entrySet()) {
+      for (int i = 0; i < mapConjunto.getValue().size(); i++) {
+        var regra = mapConjunto.getValue().get(i);
+        if (conjuntosUnitarios.containsKey(regra)) {
+          for (var regraInserir : conjuntosUnitarios.get(regra)) {
+            if (!mapConjunto.getValue().contains(regraInserir)) {
+              mapConjunto.getValue().add(mapConjunto.getValue().size() - 1, regraInserir);
+            }
+          }
+        }
+
+      }
+    }
+
+    return conjuntosUnitarios;
   }
 
   public void gramaticaReversa() {
@@ -175,35 +222,74 @@ public class Gramatica {
   }
 
   public void removerRegraUnidade() {
+
     int repetir = 1;
 
-    while (repetir != 0) {
-      repetir = 0;
-      for (var mapRegras : gramatica.entrySet()) {
-        var umElemento = menoQueDois(mapRegras.getValue());
+    for (var mapRegras : gramatica.entrySet()) {
+      var umElemento = menorQueDois(mapRegras.getValue());
 
-        for (int i = 0; i < umElemento.size(); i++) {
-          if (terminais.contains(mapRegras.getValue().listaRegras.get(umElemento.get(i)).regraCompleta)) {
-            umElemento.remove(i);
-            i--;
-          }
-        }
+      // for (int i = 0; i < umElemento.size(); i++) {
+      // if
+      // (terminais.contains(mapRegras.getValue().listaRegras.get(umElemento.get(i)).regraCompleta))
+      // {
+      // umElemento.remove(i);
+      // i--;
+      // }
+      // }
 
-        if (repetir == 0) {
-          repetir = umElemento.size();
-        }
-
-        for (int i = 0; i < umElemento.size(); i++) {
-          var regra = gramatica.get(mapRegras.getValue().listaRegras.get(umElemento.get(i) - i).regraCompleta);
-          var regrasSubstituir = copiarRegras(regra);
-          mapRegras.getValue().removerRegraCompleta(umElemento.get(i) - i);
-          mapRegras.getValue().listaRegras.addAll(regrasSubstituir);
-
-        }
+      if (!umElemento.isEmpty()) {
+        var chavesRemoverUnitario = new ArrayList<String>();
+        chavesRemoverUnitario.add(mapRegras.getKey());
+        removerRegraUnidade(mapRegras.getKey(), umElemento, chavesRemoverUnitario);
       }
+
+      // if (repetir == 0) {
+      // repetir = umElemento.size();
+      // }
+
+      // for (int i = 0; i < umElemento.size(); i++) {
+      // var regra =
+      // gramatica.get(mapRegras.getValue().listaRegras.get(umElemento.get(i) -
+      // i).regraCompleta);
+      // var regrasSubstituir = copiarRegras(regra);
+      // mapRegras.getValue().removerRegraCompleta(umElemento.get(i) - i);
+      // mapRegras.getValue().listaRegras.addAll(regrasSubstituir);
+
+      // }
     }
 
+    // for (var mapRegras : gramatica.entrySet()) {
+
+    // }
+
     // removerInuteis();
+  }
+
+  public void removerRegraUnidade(String chave, ArrayList<Integer> unitarios, ArrayList<String> chavesArmazenadas) {
+    for (int i = 0; i < unitarios.size(); i++) {
+      var chaveProcurar = gramatica.get(chave).listaRegras.get(unitarios.get(i) - i).regraCompleta;
+      var regras = gramatica.get(chaveProcurar);
+      var umElemento = menorQueDois(regras);
+
+      if (!umElemento.isEmpty()) {
+        if (!chavesArmazenadas.contains(chaveProcurar)) {
+          chavesArmazenadas.add(chaveProcurar);
+          removerRegraUnidade(chaveProcurar, umElemento, chavesArmazenadas);
+        }
+
+      }
+
+      var regrasSubstituir = copiarRegras(regras);
+      gramatica.get(chave).removerRegraCompleta(unitarios.get(i) - i);
+      for (int j = 0; j < regrasSubstituir.size(); j++) {
+        if (regrasSubstituir.get(j).regraCompleta.equals(chave)
+            || gramatica.get(chave).contem(regrasSubstituir.get(j).regraCompleta)) {
+          regrasSubstituir.remove(j);
+          j--;
+        }
+      }
+      gramatica.get(chave).listaRegras.addAll(regrasSubstituir);
+    }
   }
 
   public void trocarTerminal() {
@@ -301,10 +387,11 @@ public class Gramatica {
     return posicao;
   }
 
-  public ArrayList<Integer> menoQueDois(Regras regras) {
+  public ArrayList<Integer> menorQueDois(Regras regras) {
     ArrayList<Integer> posicao = new ArrayList<>();
     for (int i = 0; i < regras.listaRegras.size(); i++) {
-      if (regras.listaRegras.get(i).regraDividida.size() < 2)
+      if (regras.listaRegras.get(i).regraDividida.size() < 2
+          && !terminais.contains(regras.listaRegras.get(i).regraCompleta))
         posicao.add(i);
     }
     return posicao;
@@ -380,8 +467,14 @@ public class Gramatica {
     // S -> AA
     // A -> Aa | a
     HashMap<String, String> trocar = new HashMap<>();
+    ArrayList<String> chaves = new ArrayList<>();
+    chaves.addAll(gramatica.keySet());
+    chaves.remove(primeiraRegra);
+    chaves.add(0, primeiraRegra);
 
-    for (var listaregras1 : gramatica.entrySet()) {
+    for (var chave : chaves) {
+      var listaregras1 = gramatica.get(chave);
+
       for (var listaregras2 : gramatica.entrySet()) {
         if (listaregras1 == listaregras2)
           continue;
@@ -399,8 +492,8 @@ public class Gramatica {
           }
 
           for (int i = 0; i < regra2.regraDividida.size(); i++) {
-            if (listaregras1.getValue().listaRegras.size() != listaregras2.getValue().listaRegras.size()
-                || !listaregras1.getValue().contem(regra2.regraCompleta)) {
+            if (listaregras1.listaRegras.size() != listaregras2.getValue().listaRegras.size()
+                || !listaregras1.contem(regra2.regraCompleta)) {
               pular = true;
               if (podePularTroca) {
                 break;
@@ -422,14 +515,14 @@ public class Gramatica {
         if (pular) {
           continue;
         } else {
-          if (!trocar.containsKey(listaregras1.getKey())) {
+          if (!trocar.containsKey(chave)) {
             if (!listaregras2.getKey().equals(primeiraRegra))
-              trocar.put(listaregras2.getKey(), listaregras1.getKey());
+              trocar.put(listaregras2.getKey(), chave);
             else
-              trocar.put(listaregras1.getKey(), listaregras2.getKey());
+              trocar.put(chave, listaregras2.getKey());
           } else {
-            if (!listaregras2.getKey().equals(trocar.get(listaregras1.getKey())))
-              trocar.put(listaregras2.getKey(), trocar.get(listaregras1.getKey()));
+            if (!listaregras2.getKey().equals(trocar.get(chave)))
+              trocar.put(listaregras2.getKey(), trocar.get(chave));
           }
         }
 
@@ -909,8 +1002,8 @@ public class Gramatica {
     }
   }
 
-  public HashMap<String, Regras> relacoesUnitarias(ArrayList<String> listaNulos) {
-    HashMap<String, Regras> relacoesUnitarias = new HashMap<>();
+  public HashMap<String, ArrayList<String>> relacoesUnitarias(ArrayList<String> listaNulos) {
+    HashMap<String, ArrayList<String>> relacoesUnitarias = new HashMap<>();
 
     for (var mapRegras : gramatica.entrySet()) {
       for (var regra : mapRegras.getValue().listaRegras) {
@@ -918,10 +1011,10 @@ public class Gramatica {
 
         if (regraTeste.size() == 1 && !regraTeste.get(0).equals(vazio)) {
           if (!relacoesUnitarias.containsKey(mapRegras.getKey())) {
-            relacoesUnitarias.put(mapRegras.getKey(), new Regras());
+            relacoesUnitarias.put(mapRegras.getKey(), new ArrayList<>());
           }
 
-          relacoesUnitarias.get(mapRegras.getKey()).listaRegras.add(new Regra(regraTeste.get(0)));
+          relacoesUnitarias.get(mapRegras.getKey()).add(regraTeste.get(0));
         } else {
           for (int i = 0; i < regraTeste.size(); i++) {
             if (listaNulos.contains(regraTeste.get(i))) {
@@ -929,10 +1022,10 @@ public class Gramatica {
               regraTeste.remove(i);
 
               if (!relacoesUnitarias.containsKey(mapRegras.getKey())) {
-                relacoesUnitarias.put(mapRegras.getKey(), new Regras());
+                relacoesUnitarias.put(mapRegras.getKey(), new ArrayList<>());
               }
 
-              relacoesUnitarias.get(mapRegras.getKey()).listaRegras.add(new Regra(regraTeste.get(0)));
+              relacoesUnitarias.get(mapRegras.getKey()).add(regraTeste.get(0));
               regraTeste = regra.regraDividida;
             }
           }
