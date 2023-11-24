@@ -146,41 +146,31 @@ public class Gramatica {
     HashMap<String, ArrayList<String>> conjuntosUnitarios = new HashMap<>();
 
     for (var mapRelacoes : relacoesUnitarias.entrySet()) {
-      for (var regra : mapRelacoes.getValue()) {
+      var relacoes = mapRelacoes.getValue();
+      for (int j = 0; j < relacoes.size(); j++) {
+        if (relacoesUnitarias.containsKey(relacoes.get(j))) {
+          var listaRegra = relacoesUnitarias.get(relacoes.get(j));
+          for (int i = 0; i < listaRegra.size(); i++) {
+            if (!relacoes.contains(listaRegra.get(i))) {
+              relacoes.add(listaRegra.get(i));
+            }
+          }
+        }
+      }
+    }
+
+    for (var mapRelacoes : relacoesUnitarias.entrySet()) {
+      var relacoes = mapRelacoes.getValue();
+      for (int j = 0; j < relacoes.size(); j++) {
+        var regra = relacoes.get(j);
+
         if (!conjuntosUnitarios.containsKey(regra)) {
           conjuntosUnitarios.put(regra, new ArrayList<>());
+          // conjuntosUnitarios.get(regra).add(regra);
         }
         if (!conjuntosUnitarios.get(regra).contains(mapRelacoes.getKey())) {
           conjuntosUnitarios.get(regra).add(mapRelacoes.getKey());
         }
-      }
-    }
-
-    for (var mapConjunto : conjuntosUnitarios.entrySet()) {
-      for (int i = 0; i < mapConjunto.getValue().size(); i++) {
-        var regra = mapConjunto.getValue().get(i);
-        if (conjuntosUnitarios.containsKey(regra)) {
-          for (var regraInserir : conjuntosUnitarios.get(regra)) {
-            if (!mapConjunto.getValue().contains(regraInserir)) {
-              mapConjunto.getValue().add(mapConjunto.getValue().size() - 1, regraInserir);
-            }
-          }
-        }
-
-      }
-    }
-
-    for (var mapConjunto : conjuntosUnitarios.entrySet()) {
-      for (int i = 0; i < mapConjunto.getValue().size(); i++) {
-        var regra = mapConjunto.getValue().get(i);
-        if (conjuntosUnitarios.containsKey(regra)) {
-          for (var regraInserir : conjuntosUnitarios.get(regra)) {
-            if (!mapConjunto.getValue().contains(regraInserir)) {
-              mapConjunto.getValue().add(mapConjunto.getValue().size() - 1, regraInserir);
-            }
-          }
-        }
-
       }
     }
 
