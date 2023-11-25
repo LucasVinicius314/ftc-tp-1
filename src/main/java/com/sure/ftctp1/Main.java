@@ -33,6 +33,7 @@ public class Main {
     // Para ler os testes do CYK na gramatica, é so utilizar a função:
     // readTesteGramatica(nomeDoArquivo,gramatica)
 
+    var gramatica1 = readGramatica("gramatica-2.txt");
     var gramatica = readGramatica("gramatica-2.txt");
 
     // Gramatica gramatica = new Gramatica("L", "aSaSaS");
@@ -89,8 +90,11 @@ public class Main {
     // Gramatica gramatica = new Gramatica("S", "BaBaB");
     // gramatica.inserirMuitasRegras("B", "b ?");
 
-    // Gramatica gramatica = new Gramatica("S", "B BaB");
-    // gramatica.inserirMuitasRegras("B", "b");
+    // Gramatica gramatica = new Gramatica("S", "B aB k");
+    // gramatica.inserirMuitasRegras("B", "C D S");
+    // gramatica.inserirMuitasRegras("C", "D a b");
+    // gramatica.inserirMuitasRegras("D", "c d K");
+    // gramatica.inserirMuitasRegras("K", "x y");
 
     // // gramatica.inserirMuitasRegras("S", "Z A bN");
     // gramatica.inserirMuitasRegras("Z", "aZb b bN");
@@ -99,7 +103,7 @@ public class Main {
 
     // Teste da gramática.
 
-    // eDaGramaticaNormal(gramatica, "abaab");
+    eDaGramaticaNormal(gramatica1, "(ac+b)*a");
     eDaGramaticaModificado(gramatica, "(ac+b)*a");
 
     // gramatica.imprimirRegras();
@@ -129,7 +133,7 @@ public class Main {
   public static void eDaGramaticaModificado(Gramatica gramatica, String frase) {
     gramatica.forma2NF();
 
-    if (gramatica.fazerCykModificado(frase)) {
+    if (gramatica.fazerCykModificadoVinicius(frase)) {
       System.out.println("A frase ( " + frase + " ) é da linguagem");
     } else {
       System.out.println("A frase ( " + frase + " ) não é da linguagem");

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.print.DocFlavor.STRING;
+
 public class Gramatica {
   String primeiraRegra = "";
   String vazio = "?";
@@ -142,6 +144,41 @@ public class Gramatica {
     gramaticaReversa();
   }
 
+  public void conjuntosUnitarios(HashMap<String, ArrayList<String>> relacoesUnitarias, String chaveVerificar,
+      ArrayList<String> verificar, String chaveInserir, ArrayList<String> inserirRelacoes) {
+
+    for (int i = 0; i < verificar.size(); i++) {
+      // A letra verificar.get(i) não pode estar na chave que dever ser verificada
+
+      // A letra verificar.get(i) deve ser diferente da chave que estamos tentando
+      // inserir
+
+      // A letra verificar.get(i) não pode estar no ArrayList da chave que estamos
+      // tentando inserir
+      if (!verificar.get(i).equals(chaveInserir)) {
+        if (!inserirRelacoes.contains(verificar.get(i))) {
+          inserirRelacoes.add(verificar.get(i));
+
+        }
+        // Se a letra verificar.get(i) estiver nas relaçõesUnitarias, todos os
+        // elementos dela devem ser adicionados ao
+        // ArrayList da chave atual
+        if (relacoesUnitarias.containsKey(verificar.get(i))) {
+          conjuntosUnitarios(relacoesUnitarias, verificar.get(i),
+              relacoesUnitarias.get(verificar.get(i)), chaveInserir, inserirRelacoes);
+        }
+      }
+
+    }
+    for (int i = 0; i < verificar.size(); i++) {
+      if (!inserirRelacoes.contains(verificar.get(i)) && !verificar.get(i).equals(chaveInserir)) {
+        inserirRelacoes.add(verificar.get(i));
+      }
+    }
+
+    System.out.println();
+  }
+
   public HashMap<String, ArrayList<String>> conjuntosUnitarios(HashMap<String, ArrayList<String>> relacoesUnitarias) {
     HashMap<String, ArrayList<String>> conjuntosUnitarios = new HashMap<>();
 
@@ -150,11 +187,7 @@ public class Gramatica {
       for (int j = 0; j < relacoes.size(); j++) {
         if (relacoesUnitarias.containsKey(relacoes.get(j))) {
           var listaRegra = relacoesUnitarias.get(relacoes.get(j));
-          for (int i = 0; i < listaRegra.size(); i++) {
-            if (!relacoes.contains(listaRegra.get(i))) {
-              relacoes.add(listaRegra.get(i));
-            }
-          }
+          conjuntosUnitarios(relacoesUnitarias, relacoes.get(j), listaRegra, mapRelacoes.getKey(), relacoes);
         }
       }
     }
@@ -993,7 +1026,10 @@ public class Gramatica {
 
     for (var mapRegras : gramatica.entrySet()) {
       for (var regra : mapRegras.getValue().listaRegras) {
-        var regraTeste = regra.regraDividida;
+        var regraTeste = new ArrayList<String>();
+        for (String string : regra.regraDividida) {
+          regraTeste.add(string);
+        }
 
         if (regraTeste.size() == 1 && !regraTeste.get(0).equals(vazio)) {
           if (!relacoesUnitarias.containsKey(mapRegras.getKey())) {
@@ -1023,19 +1059,52 @@ public class Gramatica {
     return relacoesUnitarias;
   }
 
-  // TODO: terminar
-  public boolean fazerCykModificado(String frase) {
-
-    // Se a cadeia a ser testada for vazio, a primeira regra deve ter vazio
-    if (frase.isEmpty() || frase.equals(vazio)) {
-      return gramatica.get(primeiraRegra).contem(vazio);
+  public ArrayList<String> unitarios(HashMap<String, ArrayList<String>> relacoesUnitarias, Regra regra,
+      String letra) {
+    final var unitarios = new ArrayList<String>();
+    if (relacoesUnitarias.containsKey(letra)) {
+      for (var relacaoLetra : relacoesUnitarias.get(letra)) {
+        if (!unitarios.contains(relacaoLetra))
+          unitarios.add(relacaoLetra);
+      }
     }
+
+    return unitarios;
+  }
+
+  // TODO: terminar
+  public boolean fazerCykModificadoVinicius(String frase) {
+
+    // // Se a cadeia a ser testada for vazio, a primeira regra deve ter vazio
+    // if (frase.isEmpty() || frase.equals(vazio)) {
+    // return gramatica.get(primeiraRegra).contem(vazio);
+    // }
 
     final var tamanho = frase.length();
 
     final var tabela = new TabelaCykModificado(tamanho);
+    final var tabela2 = new TabelaCykModificado(tamanho);
 
-    final var mapConjuntoUnitario = conjuntosUnitarios(relacoesUnitarias(nullable()));
+    final var nulos = nullable();
+
+    // Verificar se tme ? na gramatica
+    if (frase.equals("?") || frase.isEmpty())
+      return nulos.contains(primeiraRegra);
+
+    final var relacoesUnitarias = relacoesUnitarias(nulos);
+    final var mapConjuntoUnitario = conjuntosUnitarios(relacoesUnitarias);
+
+    var regraCadeiTeste = new Regras();
+    var testarCadeiaArray = regraCadeiTeste.inserirListaRegra(frase);
+    // Divide a cadeia a ser testada em uma nova regra
+
+    // Se a cadeia a ser testada não tem todas as letras da gramatica, então não é
+    // da gramatica
+    for (String variavel : testarCadeiaArray.regraDividida) {
+      if (!terminais.contains(variavel) && !gramatica.keySet().contains(variavel)) {
+        return false;
+      }
+    }
 
     for (var index = 0; index < tamanho; index++) {
 
@@ -1053,24 +1122,100 @@ public class Gramatica {
 
       // TODO: terminar
 
-      final var letraDaEsquerda = tabela.linhas.get(coordenada.y).get(coordenada.y);
-      final var letraDeBaixo = tabela.linhas.get(coordenada.x).get(coordenada.x);
+      final var letraDaEsquerda = tabela.linhas.get(coordenada.i).get(coordenada.h);
+      final var letraDeBaixo = tabela.linhas.get(coordenada.h + 1).get(coordenada.j);
 
-      final var temEsquerda = new ArrayList<>();
-      final var temBaixo = new ArrayList<>();
+      // final var temEsquerda = new ArrayList<String>();
+      // final var temBaixo = new ArrayList<String>();
+      final var temTudo = new ArrayList<String>();
 
-      for (final var regra : gramatica.entrySet()) {
+      if ((!letraDaEsquerda.secundarios.isEmpty() || !letraDaEsquerda.principal.equals(""))
+          && !letraDeBaixo.secundarios.isEmpty() || !letraDeBaixo.principal.equals("")) {
 
-        if (!regra.getValue().listaRegras.stream().filter(v -> v.regraDividida.contains(letraDaEsquerda.principal))
-            .collect(Collectors.toList()).isEmpty()) {
+        for (final var mapRegras : gramatica.entrySet()) {
+          for (var regra : mapRegras.getValue().listaRegras) {
+            if (regra.regraDividida.size() == 2) {
 
-          temEsquerda.add(regra.getKey());
+              var letraVerificarEsquerda = regra.regraDividida.get(0);
+              var letraVerificarDireita = regra.regraDividida.get(1);
+
+              if ((letraDaEsquerda.principal.equals(letraVerificarEsquerda)
+                  || letraDaEsquerda.secundarios.contains(letraVerificarEsquerda)
+                  || (mapConjuntoUnitario.containsKey(letraVerificarEsquerda)
+                      && mapConjuntoUnitario.get(letraVerificarEsquerda).contains(letraDaEsquerda.principal)))
+                  && (letraDeBaixo.principal.equals(letraVerificarDireita)
+                      || letraDeBaixo.secundarios.contains(letraVerificarDireita)
+                      || (mapConjuntoUnitario.containsKey(letraVerificarDireita)
+                          && mapConjuntoUnitario.get(letraVerificarDireita).contains(letraDeBaixo.principal)))) {
+
+                if (!temTudo.contains(mapRegras.getKey())) {
+                  temTudo.add(mapRegras.getKey());
+                }
+              }
+
+              // if (!temEsquerda.contains(mapRegras.getKey()))
+              // if (relacoesUnitarias.containsKey(regra.regraDividida.get(0))) {
+              // for (var string : relacoesUnitarias.get(regra.regraDividida.get(0))) {
+              // if (string.equals(letraDaEsquerda.principal)) {
+              // temEsquerda.add(mapRegras.getKey());
+              // break;
+              // }
+              // }
+              // }
+
+              // if (!temBaixo.contains(mapRegras.getKey()))
+              // if (relacoesUnitarias.containsKey(regra.regraDividida.get(1))) {
+              // for (var string : relacoesUnitarias.get(regra.regraDividida.get(1))) {
+              // if (string.equals(letraDeBaixo.principal)) {
+
+              // temBaixo.add(mapRegras.getKey());
+              // break;
+              // }
+              // }
+              // }
+
+            }
+          }
+          // if (!temEsquerda.contains(mapRegras.getKey()))
+          // temEsquerda.add(mapRegras.getKey());
+          // }
+          // if (!mapRegras.getValue().listaRegras.stream()
+          // .filter(v -> v.regraDividida.get(0).contains(letraDaEsquerda.principal))
+          // .collect(Collectors.toList()).isEmpty()) {
+          // temEsquerda.add(mapRegras.getKey());
+          // }
+
+          // if (!mapRegras.getValue().listaRegras.stream()
+          // .filter(v -> v.regraDividida.get(1).contains(letraDeBaixo.principal))
+          // .collect(Collectors.toList()).isEmpty()) {
+
+          // temBaixo.add(mapRegras.getKey());
+          // }
+
+          for (final var letra : temTudo) {
+            if (!tabela2.linhas.get(coordenada.i).get(coordenada.j).secundarios.contains(letra)) {
+              tabela2.linhas.get(coordenada.i).get(coordenada.j).secundarios.add(letra);
+            }
+          }
+          // for (final var letra : temBaixo) {
+          // if
+          // (!tabela2.linhas.get(coordenada.i).get(coordenada.j).secundarios.contains(letra))
+          // {
+          // tabela2.linhas.get(coordenada.i).get(coordenada.j).secundarios.add(letra);
+          // }
+          // }
         }
-
-        if (!regra.getValue().listaRegras.stream().filter(v -> v.regraDividida.contains(letraDeBaixo.principal))
-            .collect(Collectors.toList()).isEmpty()) {
-
-          temBaixo.add(regra.getKey());
+      }
+      for (final var letra : tabela2.linhas.get(coordenada.i).get(coordenada.j).secundarios) {
+        if (!tabela.linhas.get(coordenada.i).get(coordenada.j).secundarios.contains(letra)) {
+          tabela.linhas.get(coordenada.i).get(coordenada.j).secundarios.add(letra);
+        }
+        if (mapConjuntoUnitario.containsKey(letra)) {
+          for (var letraInserir : mapConjuntoUnitario.get(letra)) {
+            if (!tabela.linhas.get(coordenada.i).get(coordenada.j).secundarios.contains(letraInserir)) {
+              tabela.linhas.get(coordenada.i).get(coordenada.j).secundarios.add(letraInserir);
+            }
+          }
         }
       }
 
@@ -1082,7 +1227,7 @@ public class Gramatica {
 
     System.out.println(tabela);
 
-    return false;
+    return tabela.linhas.get(0).get(tamanho - 1).secundarios.contains(primeiraRegra);
   }
 
   /**
@@ -1098,13 +1243,31 @@ public class Gramatica {
 
     final var fila = new ArrayList<Coordenada>();
 
-    for (int y = indiceMaximo - 1; y >= 0; y--) {
+    // for (int y = indiceMaximo - 1; y >= 0; y--) {
 
-      var novoY = y;
+    // var novoY = y;
 
-      for (int count = 0; novoY >= 0; count++, novoY--) {
+    // for (int count = 0; novoY >= 0; count++, novoY--) {
 
-        fila.add(new Coordenada(indiceMaximo - count, novoY));
+    // fila.add(new Coordenada(indiceMaximo - count, novoY));
+    // }
+    // }
+
+    // for (int y = 2; y <= indiceMaximo; y++) {
+
+    // var novoY = y;
+
+    // for (int count = 0; novoY >= 0; count++, novoY--) {
+
+    // fila.add(new Coordenada(indiceMaximo - count, novoY));
+    // }
+    // }
+
+    for (int j = 2; j <= indiceMaximo + 1; j++) {
+      for (int i = j - 1; i >= 1; i--) {
+        for (int h = i; h <= j - 1; h++) {
+          fila.add(new Coordenada(j - 1, i - 1, h - 1));
+        }
       }
     }
 
@@ -1268,12 +1431,13 @@ class ItemCykModificado {
 
 class Coordenada {
 
-  public Coordenada(int x, int y) {
-
-    this.x = x;
-    this.y = y;
+  public Coordenada(int j, int x, int y) {
+    this.j = j;
+    this.i = x;
+    this.h = y;
   }
 
-  public int x;
-  public int y;
+  public int j;
+  public int i;
+  public int h;
 }
