@@ -1,4 +1,5 @@
-E -> T | E+T
-T -> F | TkF
-F -> aI | bI | (E)
-I -> cI | dI | ?
+S -> AC | AB | SA
+A -> Aa | Ab | ?
+B -> Bb | D
+C -> bB
+D -> a | d | ?

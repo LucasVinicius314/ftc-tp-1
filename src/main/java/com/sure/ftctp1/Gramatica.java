@@ -572,6 +572,27 @@ public class Gramatica {
     }
   }
 
+  public void removerRegraIgual(Regras regras) {
+    // S - > A | BA | BA
+    // FICA : S - > A | BA
+
+    ArrayList<String> regraUnicas = new ArrayList<>();
+    ArrayList<Integer> regraRemover = new ArrayList<>();
+    int i = 0;
+    for (var regra : regras.listaRegras) {
+      if (!regraUnicas.contains(regra.regraCompleta)) {
+        regraUnicas.add(regra.regraCompleta);
+      } else {
+        regraRemover.add(i);
+      }
+      i++;
+    }
+    for (int j = 0; j < regraRemover.size(); j++) {
+      regras.listaRegras.remove(regraRemover.get(j) - j);
+    }
+
+  }
+
   public void removerInuteis() {
 
     removerRegraIgual();
@@ -1300,25 +1321,36 @@ public class Gramatica {
   // 18 todo := todo ∪ {A}
   // 19 return nullable
 
+  public void inserirRegrasNulas(Gramatica regrasNulas, String letra1, String inserir1, String inserir2) {
+    regrasNulas.inserirRegra(letra1, inserir1);
+    regrasNulas.inserirRegra(letra1, inserir2);
+    removerRegraIgual(regrasNulas.gramatica.get(letra1));
+  }
+
   public ArrayList<String> nullable() {
-    var regrasNulas = new Gramatica(primeiraRegra);
+    HashMap<String, ArrayList<Tupla>> regrasNulas1 = new HashMap<>();
+    // HashMap<String, ArrayList<String>> ocorrencias = new HashMap<>();
+    // var regrasNulas = new Gramatica(primeiraRegra);
     var nullAble = new ArrayList<String>();
     var todo = new ArrayList<String>();
 
     for (var regra : gramatica.entrySet()) {
-      regrasNulas.criarRegrasVazias(regra.getKey());
+      regrasNulas1.put(regra.getKey(), new ArrayList<Tupla>());
+      // ocorrencias.put(regra.getKey(), new ArrayList<String>());
     }
 
     for (var mapRegras : gramatica.entrySet()) {
       for (var regra : mapRegras.getValue().listaRegras) {
         if (regra.regraDividida.size() == 1 && Character.isUpperCase(regra.regraDividida.get(0).charAt(0))) {
-          regrasNulas.inserirRegra(regra.regraCompleta, mapRegras.getKey());
+
+          regrasNulas1.get(regra.regraCompleta).add(new Tupla(mapRegras.getKey()));
         } else if (regra.regraDividida.size() == 2 && Character.isUpperCase(regra.regraDividida.get(0).charAt(0))
             && Character.isUpperCase(regra.regraDividida.get(1).charAt(0))) {
-          regrasNulas.inserirRegra(regra.regraDividida.get(0), mapRegras.getKey());
-          regrasNulas.inserirRegra(regra.regraDividida.get(0), regra.regraDividida.get(1));
-          regrasNulas.inserirRegra(regra.regraDividida.get(1), mapRegras.getKey());
-          regrasNulas.inserirRegra(regra.regraDividida.get(1), regra.regraDividida.get(0));
+
+          regrasNulas1.get(regra.regraDividida.get(0)).add(new Tupla(mapRegras.getKey(), regra.regraDividida.get(1)));
+          if (!regra.regraDividida.get(0).equals(regra.regraDividida.get(1)))
+            regrasNulas1.get(regra.regraDividida.get(1)).add(new Tupla(mapRegras.getKey(), regra.regraDividida.get(0)));
+
         } else if (regra.regraCompleta.equals(vazio)) {
           nullAble.add(mapRegras.getKey());
           todo.add(mapRegras.getKey());
@@ -1328,29 +1360,26 @@ public class Gramatica {
 
     while (!todo.isEmpty()) {
       var chaveVerificar = todo.remove(0);
-      var regras = gramaticaReversa.get(chaveVerificar);
-      if (regras != null)
-        for (var regra : regras.listaRegras) {
-          if (nullAble.contains(regra.regraCompleta)) {
-            if (!nullAble.contains(chaveVerificar)) {
-              nullAble.add(chaveVerificar);
-              todo.add(chaveVerificar);
-            }
+      for (var regra : regrasNulas1.get(chaveVerificar)) {
+        if (regra.b != null) {
+          // Regra A -> BC
+          // FICA:
+          // B - > AC - C -> AB
+          if (!nullAble.contains(regra.a) && nullAble.contains(regra.b)) {
+            nullAble.add(regra.a);
+            todo.add(regra.a);
+          }
+        } else {
+          // Regra A -> B
+          // FICA:
+          // B - > A
+          if (!nullAble.contains(regra.a)) {
+            nullAble.add(regra.a);
+            todo.add(regra.a);
           }
         }
 
-      // for (var regra : mapRegras.getValue().regras) {
-      // if (regra.regra.get(0) == "?") {
-      // regrasNulas.inserirRegra(regra.regraCompleta, mapRegras.getKey());
-      // } else if (regra.regra.size() == 2 &&
-      // Character.isUpperCase(regra.regra.get(0).charAt(0))
-      // && Character.isUpperCase(regra.regra.get(1).charAt(0))) {
-      // regrasNulas.inserirRegra(regra.regra.get(0), mapRegras.getKey());
-      // regrasNulas.inserirRegra(regra.regra.get(0), regra.regra.get(1));
-      // regrasNulas.inserirRegra(regra.regra.get(1), mapRegras.getKey());
-      // regrasNulas.inserirRegra(regra.regra.get(1), regra.regra.get(0));
-      // }
-      // }
+      }
     }
 
     return nullAble;
@@ -1440,4 +1469,20 @@ class Coordenada {
   public int j;
   public int i;
   public int h;
+}
+
+class Tupla {
+
+  public Tupla(String a, String b) {
+    this.a = a;
+    this.b = b;
+  }
+
+  public Tupla(String a) {
+    this.a = a;
+
+  }
+
+  public String a;
+  public String b;
 }

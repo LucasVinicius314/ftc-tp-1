@@ -33,8 +33,8 @@ public class Main {
     // Para ler os testes do CYK na gramatica, é so utilizar a função:
     // readTesteGramatica(nomeDoArquivo,gramatica)
 
-    var gramatica1 = readGramatica("gramatica-2.txt");
-    var gramatica = readGramatica("gramatica-2.txt");
+    var gramatica1 = readGramatica("gramatica.txt");
+    var gramatica = readGramatica("gramatica.txt");
 
     // Gramatica gramatica = new Gramatica("L", "aSaSaS");
     // gramatica.inserirMuitasRegras("S", "b ?");
@@ -104,6 +104,7 @@ public class Main {
     // Teste da gramática.
 
     eDaGramaticaNormal(gramatica1, "(ac+b)*a");
+    System.out.println(" --------------------------------------------------- ");
     eDaGramaticaModificado(gramatica, "(ac+b)*a");
 
     // gramatica.imprimirRegras();
