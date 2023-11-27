@@ -1,0 +1,9 @@
+S -> SE | a | AX | AB | K
+E -> EE| a | AX | AB | K
+A -> h | ? | a | b
+X -> SB
+B -> k
+K -> H
+H -> I 
+I -> Z
+Z -> aZb | b

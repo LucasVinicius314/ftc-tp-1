@@ -33,8 +33,8 @@ public class Main {
     // Para ler os testes do CYK na gramatica, é so utilizar a função:
     // readTesteGramatica(nomeDoArquivo,gramatica)
 
-    var gramatica1 = readGramatica("gramatica.txt");
-    var gramatica = readGramatica("gramatica.txt");
+    var gramatica1 = readGramaticaModificada("gramatica-2.txt");
+    var gramatica = readGramaticaNormal("gramatica-2.txt");
 
     // Gramatica gramatica = new Gramatica("L", "aSaSaS");
     // gramatica.inserirMuitasRegras("S", "b ?");
@@ -53,11 +53,11 @@ public class Main {
     // gramatica.inserirMuitasRegras("S", "b ?");
 
     // Gramatica gramatica = new Gramatica("S", "KG BC");
-    // // gramatica.inserirMuitasRegras("A", "CC a");
-    // // gramatica.inserirMuitasRegras("B", "CC a");
+    // gramatica.inserirMuitasRegras("A", "CC a");
+    // gramatica.inserirMuitasRegras("B", "CC a");
     // gramatica.inserirMuitasRegras("K", "a aK");
     // gramatica.inserirMuitasRegras("G", "aK a");
-    // // gramatica.inserirMuitasRegras("C", "b");
+    // gramatica.inserirMuitasRegras("C", "b");
 
     // Gramatica gramatica = new Gramatica("S", "AB BC");
     // gramatica.inserirMuitasRegras("A", "a BA");
@@ -79,8 +79,8 @@ public class Main {
     // gramatica.inserirMuitasRegras("X", "SB");
     // gramatica.inserirMuitasRegras("K", "H");
     // gramatica.inserirMuitasRegras("H", "I");
-    // gramatica.inserirMuitasRegras("I", "K");
-
+    // gramatica.inserirMuitasRegras("I", "Z");
+    // gramatica.inserirMuitasRegras("Z", "aZb b bN");
     // gramatica.inserirMuitasRegras("D", "a ?");
     // gramatica.inserirMuitasRegras("K", "b");
 
@@ -100,24 +100,27 @@ public class Main {
     // gramatica.inserirMuitasRegras("Z", "aZb b bN");
     // gramatica.inserirMuitasRegras("N", "Na Nb ? bN aN");
     // gramatica.inserirMuitasRegras("A", "aAb a aA baN");
-
     // Teste da gramática.
-
-    eDaGramaticaNormal(gramatica1, "(ac+b)*a");
+    long start = System.currentTimeMillis();
+    // eDaGramaticaNormal(gramatica1, "(ac+b)*a");
+    var tempoCNF = readTesteGramaticaNormal("testarFrase.txt", gramatica);
+    long tempoCykNormal = System.currentTimeMillis() - start;
     System.out.println(" --------------------------------------------------- ");
-    eDaGramaticaModificado(gramatica, "(ac+b)*a");
+
+    start = System.currentTimeMillis();
+    // eDaGramaticaModificado(gramatica, "(ac+b)*a");
+    var tempo2NF = readTesteGramaticaModificado("testarFrase.txt", gramatica1);
+    long tempoCykModificado = System.currentTimeMillis() - start;
 
     // gramatica.imprimirRegras();
-
-    // readTesteGramatica("testarFrase.txt", gramatica);
 
     // eDaGramatica(gramatica, "abaab");
     // eDaGramatica(gramatica, "bababab");
     // eDaGramatica(gramatica, "bbbaaa");
 
     // gramatica.nunable();
-    // System.out.println("Hello world");
-    // System.out.println(gramatica);
+    System.out.println("Tempo CYK normal: " + tempoCykNormal + " tempo CNF: " + tempoCNF);
+    System.out.println("Tempo CYK modificado: " + tempoCykModificado + " tempo 2NF: " + tempo2NF);
 
   }
 
@@ -131,17 +134,35 @@ public class Main {
     }
   }
 
-  public static void eDaGramaticaModificado(Gramatica gramatica, String frase) {
-    gramatica.forma2NF();
+  public static void eDaGramaticaNormalTestes(Gramatica gramatica, String frase) throws CloneNotSupportedException {
 
-    if (gramatica.fazerCykModificadoVinicius(frase)) {
+    if (gramatica.fazerCykNormal(frase)) {
       System.out.println("A frase ( " + frase + " ) é da linguagem");
     } else {
       System.out.println("A frase ( " + frase + " ) não é da linguagem");
     }
   }
 
-  public static Gramatica readGramatica(String path) throws Exception {
+  public static void eDaGramaticaModificadoTestes(GramaticaCykLL gramatica, String frase) throws Exception {
+
+    if (gramatica.fazerCykModificado(frase)) {
+      System.out.println("A frase ( " + frase + " ) é da linguagem");
+    } else {
+      System.out.println("A frase ( " + frase + " ) não é da linguagem");
+    }
+  }
+
+  public static void eDaGramaticaModificado(GramaticaCykLL gramatica, String frase) throws Exception {
+    gramatica.forma2NF();
+
+    if (gramatica.fazerCykModificado(frase)) {
+      System.out.println("A frase ( " + frase + " ) é da linguagem");
+    } else {
+      System.out.println("A frase ( " + frase + " ) não é da linguagem");
+    }
+  }
+
+  public static Gramatica readGramaticaNormal(String path) throws Exception {
 
     BufferedReader br = new BufferedReader(new FileReader(path));
     Gramatica gramatica = new Gramatica();
@@ -170,16 +191,67 @@ public class Main {
     return gramatica;
   }
 
-  public static void readTesteGramatica(String path, Gramatica gramatica) throws Exception {
+  public static GramaticaCykLL readGramaticaModificada(String path) throws Exception {
+
+    BufferedReader br = new BufferedReader(new FileReader(path));
+    GramaticaCykLL gramatica = new GramaticaCykLL();
+
+    String line;
+
+    if ((line = br.readLine()) != null) {
+      var primeiroTerminal = line;
+      primeiroTerminal = primeiroTerminal.replaceAll(" ->(\\s+.+)+", "");
+      primeiroTerminal = primeiroTerminal.trim();
+      line = line.replaceAll("\\S+\\s+->\\s", "");
+      line = line.replaceAll("\\s\\|", "");
+      gramatica.inserirPrimeiraRegra(primeiroTerminal, line);
+
+      while ((line = br.readLine()) != null) {
+        var naoerminal = line;
+        naoerminal = naoerminal.replaceAll(" ->(\\s+.+)+", "");
+        naoerminal = naoerminal.trim();
+        line = line.replaceAll("\\S+\\s+->\\s", "");
+        line = line.replaceAll("\\s\\|", "");
+        gramatica.inserirMuitasRegras(naoerminal, line);
+      }
+    }
+
+    br.close();
+    return gramatica;
+  }
+
+  public static long readTesteGramaticaNormal(String path, Gramatica gramatica) throws Exception {
+
+    long start = System.currentTimeMillis();
+    gramatica.formaNormalChomsky();
+    long termino = System.currentTimeMillis() - start;
+    BufferedReader br = new BufferedReader(new FileReader(path));
+
+    String line;
+
+    while ((line = br.readLine()) != null) {
+      eDaGramaticaNormalTestes(gramatica, line);
+    }
+    br.close();
+
+    return termino;
+  }
+
+  public static long readTesteGramaticaModificado(String path, GramaticaCykLL gramatica) throws Exception {
+    long start = System.currentTimeMillis();
+    gramatica.forma2NF();
+    long termino = System.currentTimeMillis() - start;
 
     BufferedReader br = new BufferedReader(new FileReader(path));
 
     String line;
 
     while ((line = br.readLine()) != null) {
-      eDaGramaticaNormal(gramatica, line);
+      eDaGramaticaModificadoTestes(gramatica, line);
     }
     br.close();
+
+    return termino;
   }
 
 }
