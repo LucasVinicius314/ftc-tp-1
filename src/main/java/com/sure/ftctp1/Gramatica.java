@@ -248,12 +248,10 @@ public class Gramatica {
         irAinda.add(naoTerminalNovo);
         posicaoMairoDois.remove(0);
       }
-
     }
-    // System.out.println("--------------");
-
   }
 
+  // Posições com a quantidade de elementos maior que dois
   public ArrayList<Integer> maiorQueDois(Regras regras) {
     ArrayList<Integer> posicao = new ArrayList<>();
     for (int i = 0; i < regras.listaRegras.size(); i++) {
@@ -263,6 +261,7 @@ public class Gramatica {
     return posicao;
   }
 
+  // Posições com a quantidade de elementos igual a um
   public ArrayList<Integer> menorQueDois(Regras regras) {
     ArrayList<Integer> posicao = new ArrayList<>();
     for (int i = 0; i < regras.listaRegras.size(); i++) {
@@ -506,7 +505,7 @@ public class Gramatica {
 
   public void removerGramatica(String chave) {
 
-    // Remove o não terminal chave de todas as regras da gramatica
+    // Remove o não terminal "chave" de todas as regras da gramatica
 
     ArrayList<String> tirarGramatica = new ArrayList<>();
 
@@ -580,7 +579,6 @@ public class Gramatica {
     // AA -> A | ?
     // A -> ?
 
-    // if (lugaresOlha.size() > 0) {
     if (arrayDaRegra.regraDividida.size() == 2) {
       variacaoRegraAtual.regraDividida.remove(lugaresOlha.get(0).intValue());
       var pular = false;
@@ -599,84 +597,6 @@ public class Gramatica {
       regraVazio.inserirVariavel(vazio);
       novasRegras.add(regraVazio);
     }
-
-    // for (int i = 0; i < lugaresOlha.size(); i++) {
-
-    // // A cada incremento permite tirar uma letra a mais
-    // int retirar = 1;
-    // // Quando for igual a quantVariavel acabou as opções de variaveis a serem
-    // // retiradas
-    // int variacaoAtual = 0;
-    // int contRetiradas = 0;
-
-    // for (int m = 0; m <= lugaresOlha.size(); m++) {
-
-    // if (m != i) {
-    // if (contRetiradas < retirar
-    // && m < lugaresOlha.size()) {
-    // int alo = lugaresOlha.get(m);
-    // variacaoRegraAtual.regraDividida.remove(alo - removidos - contRetiradas);
-    // // removidos++;
-    // contRetiradas++;
-
-    // } else {
-    // if (contRetiradas == retirar) {
-    // variacaoRegraAtual.atualizarRegraCompleta();
-    // adicionarNovaRegra(chaveRegraAtual, novasRegras, variacaoRegraAtual.clone());
-
-    // // Resetar a variacaoRegraAtual para a regra atual // tentar a nova variaçao
-    // contRetiradas = 0;
-    // m -= retirar;
-    // variacaoRegraAtual = regraAtual.clone();
-    // }
-    // variacaoAtual++;
-
-    // if (variacaoAtual >= lugaresOlha.size()) {
-    // // Olhar todos os lugar para frente da ocorrencia 0 da naoTerminal
-    // if (retirar < lugaresOlha.size() - 1) {
-    // m = 0;
-    // } else
-    // m = lugaresOlha.size() + 2; // acabou tudo
-    // retirar++;
-    // variacaoAtual = retirar;
-    // }
-
-    // }
-    // }
-    // // var var = new regra();
-    // // for (int j = 0; j < variaveis2.size(); j++) {
-    // // if (variaveis2.get(i).equals(variaveis2).get(j)) {
-    // // var.inserirVariavel();
-    // // }
-    // // }
-    // }
-    // int v = lugaresOlha.get(i);
-    // lugaresOlha.remove(0);
-    // regraAtual.regraDividida.remove(v - removidos);
-    // // if (!lugaresOlha.isEmpty()) {
-    // // var copuVariveis3.regra = new ArrayList<String>();
-    // if (!regraAtual.regraDividida.isEmpty()) {
-    // regraAtual.atualizarRegraCompleta();
-    // adicionarNovaRegra(chaveRegraAtual, novasRegras, regraAtual.clone());
-    // variacaoRegraAtual = regraAtual.clone();
-
-    // } else {
-    // if (!regrasOlhar.getValue().contemArray(vazio)) {
-    // regraAtual = new Regra();
-    // regraAtual.inserirVariavel(vazio);
-    // // regraAtual.atualizarRegraCompleta();
-    // novasRegras.add(regraAtual.clone());
-    // }
-
-    // }
-
-    // removidos++;
-    // i--;
-    // }
-    // arrayVar.add();
-    // }
-
-    // }
 
     return novasRegras;
   }
