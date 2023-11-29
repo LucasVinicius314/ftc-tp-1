@@ -102,8 +102,8 @@ public class Gramatica {
     removerRegraUnidade();
     removerInuteis();
     // System.out.println("Tirou regras de não terminal solo");
-    // imprimirRegras();
-    // System.out.println("--------------");
+    imprimirRegras();
+    System.out.println("--------------");
   }
 
   public ArrayList<Regra> copiarRegras(Regras regrasCopiar) {

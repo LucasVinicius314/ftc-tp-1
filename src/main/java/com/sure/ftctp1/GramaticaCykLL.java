@@ -18,13 +18,12 @@ public class GramaticaCykLL extends Gramatica {
 
         binario();
         removerInuteis();
+        // System.out.println("Binario");
+        imprimirRegras();
+        System.out.println("--------------");
 
         nulos = nullable();
         mapConjuntoUnitario = conjuntosUnitarios(relacoesUnitarias(nulos));
-        // System.out.println("Binario");
-        // imprimirRegras();
-        // System.out.println("--------------");
-        // gramaticaReversa();
     }
 
     public ArrayList<String> nullable() {
@@ -180,7 +179,8 @@ public class GramaticaCykLL extends Gramatica {
                                 relacoesUnitarias.put(mapRegras.getKey(), new ArrayList<>());
                             }
 
-                            relacoesUnitarias.get(mapRegras.getKey()).add(regraTeste.get(0));
+                            if (!relacoesUnitarias.get(mapRegras.getKey()).contains(regraTeste.get(0)))
+                                relacoesUnitarias.get(mapRegras.getKey()).add(regraTeste.get(0));
                             regraTeste = regra.regraDividida;
                         }
                     }
@@ -259,6 +259,7 @@ public class GramaticaCykLL extends Gramatica {
 
                                         if (!temCombinacao.contains(mapRegras.getKey())) {
                                             temCombinacao.add(mapRegras.getKey());
+                                            break;
                                         }
                                     }
                                 }

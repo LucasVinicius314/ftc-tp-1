@@ -33,8 +33,8 @@ public class Main {
     // Para ler os testes do CYK na gramatica, é so utilizar a função:
     // readTesteGramatica(nomeDoArquivo,gramatica)
 
-    var gramatica1 = readGramaticaModificada("gramatica-2.txt");
-    var gramatica = readGramaticaNormal("gramatica-2.txt");
+    var gramatica1 = readGramaticaModificada("gramatica.txt");
+    var gramatica = readGramaticaNormal("gramatica.txt");
 
     // Gramatica gramatica = new Gramatica("L", "aSaSaS");
     // gramatica.inserirMuitasRegras("S", "b ?");
@@ -178,6 +178,8 @@ public class Main {
       gramatica.inserirPrimeiraRegra(primeiroTerminal, line);
 
       while ((line = br.readLine()) != null) {
+        if (line.equals(""))
+          break;
         var naoerminal = line;
         naoerminal = naoerminal.replaceAll(" ->(\\s+.+)+", "");
         naoerminal = naoerminal.trim();
@@ -207,6 +209,8 @@ public class Main {
       gramatica.inserirPrimeiraRegra(primeiroTerminal, line);
 
       while ((line = br.readLine()) != null) {
+        if (line.equals(""))
+          break;
         var naoerminal = line;
         naoerminal = naoerminal.replaceAll(" ->(\\s+.+)+", "");
         naoerminal = naoerminal.trim();
