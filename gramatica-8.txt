@@ -1,0 +1,5 @@
+S -> aZb
+Z -> aDb | ?
+D -> aCb | ?
+C -> aBb | ?
+B -> aaZbb | ?

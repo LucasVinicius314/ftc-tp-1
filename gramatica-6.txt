@@ -1,0 +1,5 @@
+S -> DC | AE
+A -> Aa | ?
+C -> Cc | ?
+D -> aDb | ?
+E -> bEc | ?

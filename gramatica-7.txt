@@ -1,0 +1,4 @@
+S -> Z | A | bN
+Z -> aZb | b | bN
+N -> Na | Nb | ? | bN | aN
+A -> aAb| a | aA | baN

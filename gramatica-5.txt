@@ -1,0 +1,9 @@
+Q -> P | Z
+P -> aPd | aKd
+K -> AW | WD | Z
+A -> aA | a
+D -> Dd | d
+W -> bWc | bc
+Z -> W | bLc | bRc
+L -> bLc | bL | b
+R -> bRc | Rc | c

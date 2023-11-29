@@ -1,0 +1,3 @@
+S -> ZbZbZbA
+Z -> Za | ?
+A -> Aa | Ab | ? 
