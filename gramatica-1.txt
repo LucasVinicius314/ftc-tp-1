@@ -1,0 +1,4 @@
+E -> T | E+T
+T -> F | T*F
+F -> aI | bI | (E)
+I -> cI | dI | ?

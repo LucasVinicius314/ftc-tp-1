@@ -200,7 +200,7 @@ public class GramaticaCykLL extends Gramatica {
         final var tabela2 = new TabelaCykModificado(tamanho);
 
         // Verificar se tem vazio na gramatica
-        if (frase.equals("?") || frase.isEmpty())
+        if (frase.equals(vazio) || frase.isEmpty())
             return nulos.contains(primeiraRegra);
 
         var regraCadeiTeste = new Regras();
