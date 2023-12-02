@@ -105,13 +105,13 @@ public class Main {
     // Teste da gramática.
     long start = System.currentTimeMillis();
     // eDaGramaticaNormal(gramatica1, "(ac+b)*a");
-    var tempoCNF = readTesteGramaticaNormal("testarFrase1.txt", gramatica);
+    var tempoCNF = readTesteGramaticaNormal("testarFrase.txt", gramatica);
     long tempoCykNormal = System.currentTimeMillis() - start;
     System.out.println(" --------------------------------------------------- ");
 
     start = System.currentTimeMillis();
     // eDaGramaticaModificado(gramatica, "(ac+b)*a");
-    var tempo2NF = readTesteGramaticaModificado("testarFrase1.txt", gramatica1);
+    var tempo2NF = readTesteGramaticaModificado("testarFrase.txt", gramatica1);
     long tempoCykModificado = System.currentTimeMillis() - start;
 
     // gramatica.imprimirRegras();
