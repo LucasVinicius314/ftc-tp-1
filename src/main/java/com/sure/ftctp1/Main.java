@@ -1,7 +1,9 @@
 package com.sure.ftctp1;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -130,26 +132,30 @@ public class Main {
     if (gramatica.fazerCykNormal(frase)) {
       System.out.println("A frase ( " + frase + " ) é da linguagem");
     } else {
-      System.out.println("A frase ( " + frase + " ) não é da linguagem");
+      System.out.println("A frase ( " + frase + " ) não e da linguagem");
     }
   }
 
-  public static void eDaGramaticaNormalTestes(Gramatica gramatica, String frase) throws CloneNotSupportedException {
+  public static String eDaGramaticaNormalTestes(Gramatica gramatica, String frase) throws CloneNotSupportedException {
 
     if (gramatica.fazerCykNormal(frase)) {
       System.out.println("A frase ( " + frase + " ) é da linguagem");
-    } else {
-      System.out.println("A frase ( " + frase + " ) não é da linguagem");
+      return "Pertence ( " + frase + " )";
     }
+
+    System.out.println("A frase ( " + frase + " ) não e da linguagem");
+    return "Nao pertence ( " + frase + " )";
   }
 
-  public static void eDaGramaticaModificadoTestes(GramaticaCykLL gramatica, String frase) throws Exception {
+  public static String eDaGramaticaModificadoTestes(GramaticaCykLL gramatica, String frase) throws Exception {
 
     if (gramatica.fazerCykModificado(frase)) {
       System.out.println("A frase ( " + frase + " ) é da linguagem");
-    } else {
-      System.out.println("A frase ( " + frase + " ) não é da linguagem");
+      return "Pertence ( " + frase + " )";
     }
+
+    System.out.println("A frase ( " + frase + " ) não e da linguagem");
+    return "Nao pertence ( " + frase + " ) ";
   }
 
   public static void eDaGramaticaModificado(GramaticaCykLL gramatica, String frase) throws Exception {
@@ -158,7 +164,7 @@ public class Main {
     if (gramatica.fazerCykModificado(frase)) {
       System.out.println("A frase ( " + frase + " ) é da linguagem");
     } else {
-      System.out.println("A frase ( " + frase + " ) não é da linguagem");
+      System.out.println("A frase ( " + frase + " ) não e da linguagem");
     }
   }
 
@@ -229,30 +235,40 @@ public class Main {
     long start = System.currentTimeMillis();
     gramatica.formaNormalChomsky();
     long termino = System.currentTimeMillis() - start;
-    BufferedReader br = new BufferedReader(new FileReader(path));
 
+    BufferedReader br = new BufferedReader(new FileReader(path));
+    BufferedWriter escrever = new BufferedWriter(new FileWriter("respostaCNF.txt"));
+
+    escrever.write("Gramatica CNF - CYK Normal\n");
     String line;
 
     while ((line = br.readLine()) != null) {
-      eDaGramaticaNormalTestes(gramatica, line);
+      escrever.write(eDaGramaticaNormalTestes(gramatica, line) + "\n");
     }
+
+    escrever.close();
     br.close();
 
     return termino;
   }
 
   public static long readTesteGramaticaModificado(String path, GramaticaCykLL gramatica) throws Exception {
+
     long start = System.currentTimeMillis();
     gramatica.forma2NF();
     long termino = System.currentTimeMillis() - start;
 
     BufferedReader br = new BufferedReader(new FileReader(path));
+    BufferedWriter escrever = new BufferedWriter(new FileWriter("resposta2NF.txt"));
 
+    escrever.write("Gramatica 2NF - CYK Modificado\n");
     String line;
 
     while ((line = br.readLine()) != null) {
-      eDaGramaticaModificadoTestes(gramatica, line);
+      escrever.write(eDaGramaticaModificadoTestes(gramatica, line) + "\n");
     }
+
+    escrever.close();
     br.close();
 
     return termino;
